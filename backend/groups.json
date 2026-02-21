@@ -1,0 +1,126 @@
+[
+  {
+    "id": "784a1394-a9bc-4191-bcbd-4f33478f50b0",
+    "name": "Boulder's Journal",
+    "admins": [
+      "Boulder"
+    ],
+    "members": [
+      "Boulder",
+      "Satyaki",
+      "Abhirup"
+    ],
+    "joinRequests": [],
+    "messages": [
+      {
+        "id": "b7fbb28c-116b-4392-9de7-2823a339f80f",
+        "groupId": "784a1394-a9bc-4191-bcbd-4f33478f50b0",
+        "sender": "Boulder",
+        "type": "text",
+        "content": "Hello",
+        "timestamp": "2026-02-18T21:01:30.257Z",
+        "comments": [],
+        "likes": 1,
+        "likedBy": [
+          "Boulder"
+        ]
+      },
+      {
+        "id": "2c0b1a3b-a21a-4507-a16a-6fd537453a11",
+        "groupId": "784a1394-a9bc-4191-bcbd-4f33478f50b0",
+        "sender": "Boulder",
+        "type": "text",
+        "content": "How are you ?",
+        "timestamp": "2026-02-18T21:01:37.002Z",
+        "comments": [],
+        "likes": 0,
+        "likedBy": []
+      },
+      {
+        "id": "1c466a16-3a05-409e-925e-56c4939b1034",
+        "groupId": "784a1394-a9bc-4191-bcbd-4f33478f50b0",
+        "sender": "Boulder",
+        "type": "photo",
+        "content": "http://localhost:3000/uploads/1771448503859-matteo.jpg",
+        "caption": "Matteo",
+        "timestamp": "2026-02-18T21:01:47.989Z",
+        "comments": [
+          {
+            "sender": "Boulder",
+            "text": "matteo"
+          }
+        ],
+        "likes": 0,
+        "likedBy": []
+      },
+      {
+        "id": "5334a11c-48ab-495a-a4b9-77f66491dc14",
+        "groupId": "784a1394-a9bc-4191-bcbd-4f33478f50b0",
+        "sender": "SYSTEM",
+        "type": "system",
+        "content": "Satyaki joined the group",
+        "timestamp": "2026-02-20T15:02:04.989Z",
+        "comments": [],
+        "likes": 0,
+        "likedBy": []
+      },
+      {
+        "id": "d29b5dfa-09a3-4c2d-b3fe-440190c963b5",
+        "groupId": "784a1394-a9bc-4191-bcbd-4f33478f50b0",
+        "sender": "Satyaki",
+        "type": "text",
+        "content": "Hello",
+        "timestamp": "2026-02-20T15:02:27.145Z",
+        "comments": [],
+        "likes": 0,
+        "likedBy": []
+      },
+      {
+        "id": "6a830994-101a-4001-a6c8-4b9a6ce143a6",
+        "groupId": "784a1394-a9bc-4191-bcbd-4f33478f50b0",
+        "sender": "SYSTEM",
+        "type": "system",
+        "content": "Abhirup joined the group",
+        "timestamp": "2026-02-20T16:17:59.057Z",
+        "comments": [],
+        "likes": 0,
+        "likedBy": []
+      },
+      {
+        "id": "36e39cef-7122-433b-8f11-453fbaeed96b",
+        "groupId": "784a1394-a9bc-4191-bcbd-4f33478f50b0",
+        "sender": "Abhirup",
+        "type": "text",
+        "content": "Hi",
+        "timestamp": "2026-02-20T16:18:12.710Z",
+        "comments": [],
+        "likes": 0,
+        "likedBy": []
+      },
+      {
+        "id": "26d77ea4-0050-4d10-977a-9e49f75fca6c",
+        "groupId": "784a1394-a9bc-4191-bcbd-4f33478f50b0",
+        "sender": "Satyaki",
+        "type": "photo",
+        "content": "http://localhost:3000/uploads/1771650923030-matteo.jpg",
+        "caption": "",
+        "timestamp": "2026-02-21T05:15:25.084Z",
+        "comments": [],
+        "likes": 0,
+        "likedBy": []
+      }
+    ]
+  },
+  {
+    "id": "19f2a87d-d6c4-4935-89b7-057adc2503a2",
+    "name": "test_group",
+    "admins": [
+      "Boulder"
+    ],
+    "members": [
+      "Boulder"
+    ],
+    "joinRequests": [],
+    "messages": []
+  }
+]
