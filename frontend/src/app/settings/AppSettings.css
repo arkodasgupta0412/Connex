@@ -1,0 +1,29 @@
+.settings-list {
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+}
+
+.app-settings-footer {
+    padding: 20px;
+    margin-top: auto;
+}
+
+.btn-logout-full {
+    width: 100%;
+    padding: 12px;
+    background-color: var(--bg-tertiary);
+    color: var(--danger-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-logout-full:hover {
+    background-color: var(--danger-hover);
+    color: white;
+}

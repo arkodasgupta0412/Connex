@@ -1,0 +1,12 @@
+@import "../../button/Button.css";
+
+.settings-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+}
+
+.settings-btn:hover {
+    transform: rotate(90deg);
+}

@@ -1,0 +1,102 @@
+.app-sidebar-wrapper {
+    width: 24px;
+    height: 100vh;
+    position: relative;
+    flex-shrink: 0;
+    z-index: 50;
+}
+
+
+.app-sidebar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 24px;
+    background-color: var(--bg-tertiary);
+    border-right: 1px solid var(--border-color);
+    transition: width 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.app-sidebar-wrapper:hover .app-sidebar {
+    width: 68px;
+    box-shadow: 4px 0 15px rgba(0,0,0,0.2);
+}
+
+/* The '>>' Icon */
+.sidebar-trigger {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--text-secondary);
+    transition: opacity 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Hide '>>' when expanded */
+.app-sidebar-wrapper:hover .sidebar-trigger {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* The Application Icons */
+.sidebar-icons {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 68px;
+    height: 100%;
+    padding-top: 20px;
+    padding-bottom: 10px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+}
+
+
+.sidebar-icons .app-icon-btn:last-child {
+    margin-bottom: 0; 
+}
+
+/* Show icons when expanded */
+.app-sidebar-wrapper:hover .sidebar-icons {
+    opacity: 1;
+    pointer-events: auto;
+    transition-delay: 0.1s;
+}
+
+/* Individual Icon Buttons */
+.app-icon-btn {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    padding: 12px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.app-icon-btn:hover {
+    color: var(--primary-color);
+    background-color: var(--hover-bg);
+    transform: scale(1.1);
+}
+
+.app-icon-btn.active {
+    color: var(--primary-color);
+    background-color: var(--active-bg);
+}
+
+.spacer {
+    flex: 1;
+}

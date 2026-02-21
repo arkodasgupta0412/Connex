@@ -1,0 +1,30 @@
+.group-view-container {
+    display: flex;
+    width: 100%;
+    height: 100%;
+}
+
+.group-chat-area {
+    flex: 1;
+    min-width: 0;
+    background-color: var(--chat-bg);
+    display: flex;
+    flex-direction: column;
+    padding: 16px 24px 24px 16px;
+}
+
+.group-empty-state {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: var(--text-secondary);
+    text-align: center;
+    padding: 20px;
+}
+
+.group-empty-state h2 {
+    margin-bottom: 10px;
+    color: var(--text-primary);
+}

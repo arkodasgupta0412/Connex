@@ -1,0 +1,823 @@
+/* ============================================================
+   GLOBAL / UNIVERSAL TOKENS
+   ============================================================ */
+:root {
+    --danger-color: #ef4444;
+    --danger-hover: #dc2626;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.15);
+    --shadow-lg: 0 8px 24px rgba(0,0,0,0.2);
+    --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
+}
+
+/* ============================================================
+   SENDER NAME COLOR ROTATION
+   
+   In your ChatMessage component, cycle the class on each
+   sender-name element using the sender's index or a hash:
+   
+     className={`sender-name sender-color-${(colorIndex % 6) + 1}`}
+   
+   Each theme defines its own palette via --sender-1 … --sender-6.
+   ============================================================ */
+.sender-color-1 { color: var(--sender-1) !important; font-weight: 600; }
+.sender-color-2 { color: var(--sender-2) !important; font-weight: 600; }
+.sender-color-3 { color: var(--sender-3) !important; font-weight: 600; }
+.sender-color-4 { color: var(--sender-4) !important; font-weight: 600; }
+.sender-color-5 { color: var(--sender-5) !important; font-weight: 600; }
+.sender-color-6 { color: var(--sender-6) !important; font-weight: 600; }
+
+
+/* ============================================================
+   1. LIGHT — Clean, professional, WhatsApp-inspired
+   ============================================================ */
+body.light {
+    /* Base surfaces */
+    --bg-primary:    #eae6df;
+    --bg-secondary:  #ffffff;
+    --bg-tertiary:   #f0f2f5;
+
+    /* Sidebar — warm off-white, distinct from chat */
+    --sidebar-bg:         #f7f3ee;
+    --sidebar-border:     #d4cfc8;
+    --sidebar-item-bg:    #ffffff;
+    --sidebar-item-hover: #e8e2da;
+    --sidebar-item-active:#d0ebe3;
+
+    /* Chat area */
+    --chat-bg:            #e5ddd5;
+    --chat-header-bg:     #ffffff;
+    --chat-header-border: #e9edef;
+
+    /* Input bar */
+    --input-bar-bg:   #f0f2f5;
+    --input-field-bg: #ffffff;
+    --input-border:   #d1d5db;
+
+    /* Interaction */
+    --hover-bg:   rgba(0,0,0,0.05);
+    --active-bg:  rgba(0,168,132,0.12);
+    --avatar-bg:  #c8d7da;
+
+    /* Typography */
+    --text-primary:   #111b21;
+    --text-secondary: #54656f;
+    --text-muted:     #8696a0;
+
+    /* Brand */
+    --primary-color:  #00a884;
+    --primary-hover:  #007a62;
+    --primary-subtle: #e8f7f3;
+
+    /* Borders */
+    --border-color:  #e2e8ec;
+    --border-subtle: #f0f2f5;
+
+    /* Messages */
+    --msg-sent:            #d9fdd3;
+    --msg-sent-text:       #111b21;
+    --msg-sent-border:     #c3f0bc;
+    --msg-received:        #ffffff;
+    --msg-received-text:   #111b21;
+    --msg-received-border: #e9edef;
+    --msg-time:            #8696a0;
+
+    /* System messages */
+    --system-msg-bg:   rgba(255,255,255,0.85);
+    --system-msg-text: #54656f;
+
+    --overlay-color: rgba(11,20,26,0.6);
+
+    /* Sender name colors — distinct, accessible on white/green bubbles */
+    --sender-1: #00796b;
+    --sender-2: #1565c0;
+    --sender-3: #6a1b9a;
+    --sender-4: #c62828;
+    --sender-5: #e65100;
+    --sender-6: #2e7d32;
+
+    --btn-icon-bg:    transparent;
+    --btn-icon-hover: rgba(0,0,0,0.07);
+
+    --scrollbar-thumb: #ccd4d9;
+    --scrollbar-track: transparent;
+}
+
+/* ============================================================
+   2. DARK — WhatsApp Dark, deep navy
+   ============================================================ */
+body.dark {
+    --bg-primary:    #0b141a;
+    --bg-secondary:  #111b21;
+    --bg-tertiary:   #202c33;
+
+    --sidebar-bg:         #111b21;
+    --sidebar-border:     #1f2c34;
+    --sidebar-item-bg:    #182229;
+    --sidebar-item-hover: #2a3942;
+    --sidebar-item-active:#1d4a3a;
+
+    --chat-bg:            #0b141a;
+    --chat-header-bg:     #202c33;
+    --chat-header-border: #2a3942;
+
+    --input-bar-bg:   #111b21;
+    --input-field-bg: #2a3942;
+    --input-border:   #3b4a54;
+
+    --hover-bg:   rgba(255,255,255,0.05);
+    --active-bg:  rgba(0,168,132,0.15);
+    --avatar-bg:  #2a3942;
+
+    --text-primary:   #e9edef;
+    --text-secondary: #8696a0;
+    --text-muted:     #4a5e6a;
+
+    --primary-color:  #00a884;
+    --primary-hover:  #02c49a;
+    --primary-subtle: #0d2c25;
+
+    --border-color:  #2a3942;
+    --border-subtle: #1f2c34;
+
+    --msg-sent:            #005c4b;
+    --msg-sent-text:       #e9edef;
+    --msg-sent-border:     #006f5b;
+    --msg-received:        #202c33;
+    --msg-received-text:   #e9edef;
+    --msg-received-border: #2a3942;
+    --msg-time:            #667781;
+
+    --system-msg-bg:   rgba(17,27,33,0.85);
+    --system-msg-text: #8696a0;
+
+    --overlay-color: rgba(0,0,0,0.75);
+
+    --sender-1: #53bdeb;
+    --sender-2: #7bc67e;
+    --sender-3: #f0b429;
+    --sender-4: #fc8fa8;
+    --sender-5: #a29bfe;
+    --sender-6: #64dfdf;
+
+    --btn-icon-bg:    transparent;
+    --btn-icon-hover: rgba(255,255,255,0.08);
+
+    --scrollbar-thumb: #2a3942;
+    --scrollbar-track: transparent;
+}
+
+/* ============================================================
+   3. MIDNIGHT — Discord-inspired, deep charcoal
+   ============================================================ */
+body.midnight {
+    --bg-primary:    #1e1f22;
+    --bg-secondary:  #2b2d31;
+    --bg-tertiary:   #313338;
+
+    --sidebar-bg:         #2b2d31;
+    --sidebar-border:     #1e1f22;
+    --sidebar-item-bg:    #313338;
+    --sidebar-item-hover: #35373c;
+    --sidebar-item-active:#404249;
+
+    --chat-bg:            #313338;
+    --chat-header-bg:     #313338;
+    --chat-header-border: #1e1f22;
+
+    --input-bar-bg:   #313338;
+    --input-field-bg: #383a40;
+    --input-border:   #1e1f22;
+
+    --hover-bg:   rgba(255,255,255,0.06);
+    --active-bg:  rgba(88,101,242,0.2);
+    --avatar-bg:  #404249;
+
+    --text-primary:   #f2f3f5;
+    --text-secondary: #b5bac1;
+    --text-muted:     #6d6f78;
+
+    --primary-color:  #5865f2;
+    --primary-hover:  #4752c4;
+    --primary-subtle: #1e2069;
+
+    --border-color:  #1e1f22;
+    --border-subtle: #26282d;
+
+    --msg-sent:            #4f59da;
+    --msg-sent-text:       #ffffff;
+    --msg-sent-border:     #5865f2;
+    --msg-received:        #2b2d31;
+    --msg-received-text:   #dbdee1;
+    --msg-received-border: #1e1f22;
+    --msg-time:            #949ba4;
+
+    --system-msg-bg:   rgba(43,45,49,0.9);
+    --system-msg-text: #949ba4;
+
+    --overlay-color: rgba(0,0,0,0.85);
+
+    --sender-1: #7289da;
+    --sender-2: #43b581;
+    --sender-3: #faa61a;
+    --sender-4: #f04747;
+    --sender-5: #b9befa;
+    --sender-6: #eb459e;
+
+    --btn-icon-bg:    transparent;
+    --btn-icon-hover: rgba(255,255,255,0.08);
+
+    --scrollbar-thumb: #1e1f22;
+    --scrollbar-track: transparent;
+}
+
+/* ============================================================
+   4. OCEAN — Telegram-inspired, deep navy blue
+   ============================================================ */
+body.ocean {
+    --bg-primary:    #0e1621;
+    --bg-secondary:  #17212b;
+    --bg-tertiary:   #1c2733;
+
+    --sidebar-bg:         #17212b;
+    --sidebar-border:     #0e1621;
+    --sidebar-item-bg:    #1c2733;
+    --sidebar-item-hover: #242f3d;
+    --sidebar-item-active:#1a3a5c;
+
+    --chat-bg:            #0e1621;
+    --chat-header-bg:     #17212b;
+    --chat-header-border: #0e1621;
+
+    --input-bar-bg:   #17212b;
+    --input-field-bg: #242f3d;
+    --input-border:   #2b3a4a;
+
+    --hover-bg:   rgba(255,255,255,0.06);
+    --active-bg:  rgba(82,136,193,0.2);
+    --avatar-bg:  #2b3a4a;
+
+    --text-primary:   #f1f3f5;
+    --text-secondary: #7d8c96;
+    --text-muted:     #4a5868;
+
+    --primary-color:  #5288c1;
+    --primary-hover:  #3d74ad;
+    --primary-subtle: #1a2d44;
+
+    --border-color:  #0e1621;
+    --border-subtle: #141e2a;
+
+    --msg-sent:            #2b5278;
+    --msg-sent-text:       #ffffff;
+    --msg-sent-border:     #336292;
+    --msg-received:        #182533;
+    --msg-received-text:   #f1f3f5;
+    --msg-received-border: #1e2f3f;
+    --msg-time:            #4a5f70;
+
+    --system-msg-bg:   rgba(23,33,43,0.9);
+    --system-msg-text: #6d8093;
+
+    --overlay-color: rgba(14,22,33,0.9);
+
+    --sender-1: #64b5f6;
+    --sender-2: #4dd0e1;
+    --sender-3: #81c784;
+    --sender-4: #ffb74d;
+    --sender-5: #ce93d8;
+    --sender-6: #f06292;
+
+    --btn-icon-bg:    transparent;
+    --btn-icon-hover: rgba(255,255,255,0.08);
+
+    --scrollbar-thumb: #1e2d3d;
+    --scrollbar-track: transparent;
+}
+
+/* ============================================================
+   5. NORD — Arctic blue-grey, professional
+   ============================================================ */
+body.nord {
+    --bg-primary:    #242933;
+    --bg-secondary:  #2e3440;
+    --bg-tertiary:   #3b4252;
+
+    --sidebar-bg:         #2e3440;
+    --sidebar-border:     #242933;
+    --sidebar-item-bg:    #3b4252;
+    --sidebar-item-hover: #434c5e;
+    --sidebar-item-active:#3d5a7a;
+
+    --chat-bg:            #2e3440;
+    --chat-header-bg:     #3b4252;
+    --chat-header-border: #242933;
+
+    --input-bar-bg:   #2e3440;
+    --input-field-bg: #3b4252;
+    --input-border:   #242933;
+
+    --hover-bg:   rgba(255,255,255,0.06);
+    --active-bg:  rgba(136,192,208,0.15);
+    --avatar-bg:  #4c566a;
+
+    --text-primary:   #eceff4;
+    --text-secondary: #d8dee9;
+    --text-muted:     #6c7a8a;
+
+    --primary-color:  #88c0d0;
+    --primary-hover:  #6dafc3;
+    --primary-subtle: #2d3e4e;
+
+    --border-color:  #242933;
+    --border-subtle: #2b3140;
+
+    --msg-sent:            #4c6fa5;
+    --msg-sent-text:       #eceff4;
+    --msg-sent-border:     #5e81ac;
+    --msg-received:        #3b4252;
+    --msg-received-text:   #e5e9f0;
+    --msg-received-border: #2e3440;
+    --msg-time:            #6c7a8a;
+
+    --system-msg-bg:   rgba(46,52,64,0.9);
+    --system-msg-text: #7a8899;
+
+    --overlay-color: rgba(36,41,51,0.9);
+
+    --sender-1: #88c0d0;
+    --sender-2: #a3be8c;
+    --sender-3: #ebcb8b;
+    --sender-4: #bf616a;
+    --sender-5: #b48ead;
+    --sender-6: #8fbcbb;
+
+    --btn-icon-bg:    transparent;
+    --btn-icon-hover: rgba(255,255,255,0.08);
+
+    --scrollbar-thumb: #3b4252;
+    --scrollbar-track: transparent;
+}
+
+/* ============================================================
+   6. COFFEE — Warm, cozy, espresso tones
+   ============================================================ */
+body.coffee {
+    --bg-primary:    #1e1612;
+    --bg-secondary:  #2b221e;
+    --bg-tertiary:   #362b26;
+
+    --sidebar-bg:         #251b17;
+    --sidebar-border:     #1a120e;
+    --sidebar-item-bg:    #2b221e;
+    --sidebar-item-hover: #362b26;
+    --sidebar-item-active:#5c3d2e;
+
+    --chat-bg:            #2b221e;
+    --chat-header-bg:     #362b26;
+    --chat-header-border: #1a120e;
+
+    --input-bar-bg:   #2b221e;
+    --input-field-bg: #423630;
+    --input-border:   #1a120e;
+
+    --hover-bg:   rgba(255,255,255,0.05);
+    --active-bg:  rgba(221,184,146,0.15);
+    --avatar-bg:  #4f4139;
+
+    --text-primary:   #ede0d4;
+    --text-secondary: #b09e91;
+    --text-muted:     #6e5c52;
+
+    --primary-color:  #ddb892;
+    --primary-hover:  #c49a72;
+    --primary-subtle: #3d2b20;
+
+    --border-color:  #1a120e;
+    --border-subtle: #261d19;
+
+    --msg-sent:            #7f5539;
+    --msg-sent-text:       #ede0d4;
+    --msg-sent-border:     #9b6a46;
+    --msg-received:        #362b26;
+    --msg-received-text:   #e6ccb2;
+    --msg-received-border: #2b221e;
+    --msg-time:            #7a6557;
+
+    --system-msg-bg:   rgba(43,34,30,0.9);
+    --system-msg-text: #8a7264;
+
+    --overlay-color: rgba(30,22,18,0.9);
+
+    --sender-1: #ddb892;
+    --sender-2: #e6b87a;
+    --sender-3: #c88b5e;
+    --sender-4: #f4a261;
+    --sender-5: #d4a373;
+    --sender-6: #ffb347;
+
+    --btn-icon-bg:    transparent;
+    --btn-icon-hover: rgba(255,255,255,0.07);
+
+    --scrollbar-thumb: #362b26;
+    --scrollbar-track: transparent;
+}
+
+/* ============================================================
+   7. FOREST — Slack-inspired, dark charcoal + cyan
+   ============================================================ */
+body.forest {
+    --bg-primary:    #12151a;
+    --bg-secondary:  #1a1d21;
+    --bg-tertiary:   #222529;
+
+    --sidebar-bg:         #1a1d21;
+    --sidebar-border:     #12151a;
+    --sidebar-item-bg:    #222529;
+    --sidebar-item-hover: #2c3036;
+    --sidebar-item-active:#1e4a5c;
+
+    --chat-bg:            #222529;
+    --chat-header-bg:     #2c3036;
+    --chat-header-border: #12151a;
+
+    --input-bar-bg:   #1a1d21;
+    --input-field-bg: #2c3036;
+    --input-border:   #383b40;
+
+    --hover-bg:   rgba(255,255,255,0.05);
+    --active-bg:  rgba(54,197,240,0.12);
+    --avatar-bg:  #383b40;
+
+    --text-primary:   #d1d2d3;
+    --text-secondary: #9a9b9c;
+    --text-muted:     #5a5b5c;
+
+    --primary-color:  #36c5f0;
+    --primary-hover:  #27afd8;
+    --primary-subtle: #0d2d38;
+
+    --border-color:  #12151a;
+    --border-subtle: #1e2126;
+
+    --msg-sent:            #007a5a;
+    --msg-sent-text:       #ffffff;
+    --msg-sent-border:     #009470;
+    --msg-received:        #222529;
+    --msg-received-text:   #d1d2d3;
+    --msg-received-border: #2c3036;
+    --msg-time:            #6a6b6c;
+
+    --system-msg-bg:   rgba(26,29,33,0.9);
+    --system-msg-text: #7a8086;
+
+    --overlay-color: rgba(0,0,0,0.8);
+
+    --sender-1: #36c5f0;
+    --sender-2: #2eb67d;
+    --sender-3: #ecb22e;
+    --sender-4: #e01e5a;
+    --sender-5: #74b8f0;
+    --sender-6: #78d97c;
+
+    --btn-icon-bg:    transparent;
+    --btn-icon-hover: rgba(255,255,255,0.07);
+
+    --scrollbar-thumb: #2c3036;
+    --scrollbar-track: transparent;
+}
+
+/* ============================================================
+   8. CYBERPUNK — Neon on void, high contrast
+   ============================================================ */
+body.cyberpunk {
+    --bg-primary:    #02040a;
+    --bg-secondary:  #070b14;
+    --bg-tertiary:   #0d1425;
+
+    --sidebar-bg:         #050a14;
+    --sidebar-border:     rgba(184,41,234,0.27);
+    --sidebar-item-bg:    #0a1020;
+    --sidebar-item-hover: #121a2e;
+    --sidebar-item-active:#1a0a30;
+
+    --chat-bg:            #070b14;
+    --chat-header-bg:     #0d1425;
+    --chat-header-border: rgba(184,41,234,0.27);
+
+    --input-bar-bg:   #050a14;
+    --input-field-bg: #0d1425;
+    --input-border:   rgba(184,41,234,0.4);
+
+    --hover-bg:   rgba(184,41,234,0.08);
+    --active-bg:  rgba(254,228,64,0.1);
+    --avatar-bg:  #1e2946;
+
+    --text-primary:   #00f3ff;
+    --text-secondary: #b829ea;
+    --text-muted:     #3a2060;
+
+    --primary-color:  #fee440;
+    --primary-hover:  #f9c600;
+    --primary-subtle: #1a1400;
+
+    --border-color:  rgba(184,41,234,0.27);
+    --border-subtle: rgba(184,41,234,0.13);
+
+    --msg-sent:            #2a1b4e;
+    --msg-sent-text:       #00f3ff;
+    --msg-sent-border:     rgba(184,41,234,0.4);
+    --msg-received:        #070b14;
+    --msg-received-text:   #fee440;
+    --msg-received-border: rgba(184,41,234,0.2);
+    --msg-time:            #3a2060;
+
+    --system-msg-bg:   rgba(7,11,20,0.95);
+    --system-msg-text: #b829ea;
+
+    --overlay-color: rgba(2,4,10,0.95);
+
+    --sender-1: #fee440;
+    --sender-2: #00f3ff;
+    --sender-3: #ff00ff;
+    --sender-4: #ff3860;
+    --sender-5: #b829ea;
+    --sender-6: #00ffaa;
+
+    --btn-icon-bg:    transparent;
+    --btn-icon-hover: rgba(184,41,234,0.15);
+
+    --scrollbar-thumb: #1e2946;
+    --scrollbar-track: transparent;
+}
+
+/* ============================================================
+   9. SUNSET — Warm amber and peach, light theme
+   ============================================================ */
+body.sunset {
+    --bg-primary:    #fdf3e7;
+    --bg-secondary:  #ffffff;
+    --bg-tertiary:   #fce8cc;
+
+    --sidebar-bg:         #fff8f0;
+    --sidebar-border:     #f0d5b0;
+    --sidebar-item-bg:    #ffffff;
+    --sidebar-item-hover: #fce8cc;
+    --sidebar-item-active:#ffd4a8;
+
+    --chat-bg:            #fdf3e7;
+    --chat-header-bg:     #ffffff;
+    --chat-header-border: #f0d5b0;
+
+    --input-bar-bg:   #fff8f0;
+    --input-field-bg: #ffffff;
+    --input-border:   #e8c49a;
+
+    --hover-bg:   rgba(0,0,0,0.04);
+    --active-bg:  rgba(224,123,32,0.12);
+    --avatar-bg:  #ffdcb3;
+
+    --text-primary:   #3d2314;
+    --text-secondary: #8a5a3a;
+    --text-muted:     #c09070;
+
+    --primary-color:  #e07b20;
+    --primary-hover:  #c06010;
+    --primary-subtle: #fff0e0;
+
+    --border-color:  #ecd4b0;
+    --border-subtle: #f5e4cc;
+
+    --msg-sent:            #ffc896;
+    --msg-sent-text:       #3d2314;
+    --msg-sent-border:     #f0ac7a;
+    --msg-received:        #ffffff;
+    --msg-received-text:   #3d2314;
+    --msg-received-border: #ecd4b0;
+    --msg-time:            #b08060;
+
+    --system-msg-bg:   rgba(255,244,232,0.9);
+    --system-msg-text: #8a5a3a;
+
+    --overlay-color: rgba(61,35,20,0.5);
+
+    --sender-1: #c0460a;
+    --sender-2: #7a6000;
+    --sender-3: #6b3a8c;
+    --sender-4: #1a6b3c;
+    --sender-5: #2a5c8c;
+    --sender-6: #8c2a2a;
+
+    --btn-icon-bg:    transparent;
+    --btn-icon-hover: rgba(0,0,0,0.06);
+
+    --scrollbar-thumb: #e0c4a0;
+    --scrollbar-track: transparent;
+}
+
+/* ============================================================
+   10. LAVENDER — Soft pastel purple, light
+   ============================================================ */
+body.lavender {
+    --bg-primary:    #f2f0ff;
+    --bg-secondary:  #ffffff;
+    --bg-tertiary:   #ede9ff;
+
+    --sidebar-bg:         #f7f5ff;
+    --sidebar-border:     #d8d0f5;
+    --sidebar-item-bg:    #ffffff;
+    --sidebar-item-hover: #ede9ff;
+    --sidebar-item-active:#ddd5ff;
+
+    --chat-bg:            #f2f0ff;
+    --chat-header-bg:     #ffffff;
+    --chat-header-border: #d8d0f5;
+
+    --input-bar-bg:   #f7f5ff;
+    --input-field-bg: #ffffff;
+    --input-border:   #c8bef5;
+
+    --hover-bg:   rgba(0,0,0,0.04);
+    --active-bg:  rgba(123,97,255,0.1);
+    --avatar-bg:  #d4ccff;
+
+    --text-primary:   #2d2b42;
+    --text-secondary: #6b6494;
+    --text-muted:     #a89ec8;
+
+    --primary-color:  #7b61ff;
+    --primary-hover:  #6246ea;
+    --primary-subtle: #f0ecff;
+
+    --border-color:  #d8d0f5;
+    --border-subtle: #ebe6ff;
+
+    --msg-sent:            #d4c8ff;
+    --msg-sent-text:       #2d2b42;
+    --msg-sent-border:     #b8a8f5;
+    --msg-received:        #ffffff;
+    --msg-received-text:   #3d3860;
+    --msg-received-border: #e0d9ff;
+    --msg-time:            #9088b8;
+
+    --system-msg-bg:   rgba(242,240,255,0.9);
+    --system-msg-text: #7b70a8;
+
+    --overlay-color: rgba(45,43,66,0.5);
+
+    --sender-1: #7b61ff;
+    --sender-2: #e0507a;
+    --sender-3: #1a8fa0;
+    --sender-4: #2db87c;
+    --sender-5: #d05020;
+    --sender-6: #9c4de0;
+
+    --btn-icon-bg:    transparent;
+    --btn-icon-hover: rgba(0,0,0,0.05);
+
+    --scrollbar-thumb: #c8bef5;
+    --scrollbar-track: transparent;
+}
+
+/* ============================================================
+   11. TERMINAL — Matrix green on void black
+   ============================================================ */
+body.terminal {
+    --bg-primary:    #000000;
+    --bg-secondary:  #050505;
+    --bg-tertiary:   #0a0a0a;
+
+    --sidebar-bg:         #000000;
+    --sidebar-border:     #003300;
+    --sidebar-item-bg:    #050505;
+    --sidebar-item-hover: #001400;
+    --sidebar-item-active:#002800;
+
+    --chat-bg:            #050505;
+    --chat-header-bg:     #0a0a0a;
+    --chat-header-border: #003300;
+
+    --input-bar-bg:   #000000;
+    --input-field-bg: #0a0a0a;
+    --input-border:   #004400;
+
+    --hover-bg:   rgba(51,255,0,0.06);
+    --active-bg:  rgba(51,255,0,0.12);
+    --avatar-bg:  #0a290a;
+
+    --text-primary:   #33ff00;
+    --text-secondary: #1a9900;
+    --text-muted:     #0a5500;
+
+    --primary-color:  #33ff00;
+    --primary-hover:  #55ff33;
+    --primary-subtle: #001a00;
+
+    --border-color:  #003300;
+    --border-subtle: #001a00;
+
+    --msg-sent:            #001a00;
+    --msg-sent-text:       #33ff00;
+    --msg-sent-border:     #004400;
+    --msg-received:        #050505;
+    --msg-received-text:   #22cc00;
+    --msg-received-border: #003300;
+    --msg-time:            #0a5500;
+
+    --system-msg-bg:   rgba(0,20,0,0.95);
+    --system-msg-text: #1a9900;
+
+    --overlay-color: rgba(0,10,0,0.95);
+
+    --sender-1: #33ff00;
+    --sender-2: #00ff99;
+    --sender-3: #aaff00;
+    --sender-4: #00ffcc;
+    --sender-5: #66ff33;
+    --sender-6: #33ffaa;
+
+    --btn-icon-bg:    transparent;
+    --btn-icon-hover: rgba(51,255,0,0.1);
+
+    --scrollbar-thumb: #003300;
+    --scrollbar-track: transparent;
+}
+
+/* ============================================================
+   12. WINE — Elegant deep burgundy
+   ============================================================ */
+body.wine {
+    --bg-primary:    #140d10;
+    --bg-secondary:  #1f1a1d;
+    --bg-tertiary:   #2b2226;
+
+    --sidebar-bg:         #1a1317;
+    --sidebar-border:     #2a1e24;
+    --sidebar-item-bg:    #231c20;
+    --sidebar-item-hover: #2b2226;
+    --sidebar-item-active:#5c2040;
+
+    --chat-bg:            #1f1a1d;
+    --chat-header-bg:     #2b2226;
+    --chat-header-border: #140d10;
+
+    --input-bar-bg:   #1a1317;
+    --input-field-bg: #382c32;
+    --input-border:   #2a1e24;
+
+    --hover-bg:   rgba(255,255,255,0.05);
+    --active-bg:  rgba(194,96,126,0.15);
+    --avatar-bg:  #4a343f;
+
+    --text-primary:   #e8dce4;
+    --text-secondary: #9e8a92;
+    --text-muted:     #5a4550;
+
+    --primary-color:  #c2607e;
+    --primary-hover:  #a84a68;
+    --primary-subtle: #2a1020;
+
+    --border-color:  #2a1e24;
+    --border-subtle: #221820;
+
+    --msg-sent:            #6b2448;
+    --msg-sent-text:       #f0dce6;
+    --msg-sent-border:     #8c305e;
+    --msg-received:        #2b2226;
+    --msg-received-text:   #e6dce1;
+    --msg-received-border: #382c32;
+    --msg-time:            #6a4e58;
+
+    --system-msg-bg:   rgba(31,26,29,0.9);
+    --system-msg-text: #7a5e6a;
+
+    --overlay-color: rgba(20,13,16,0.9);
+
+    --sender-1: #f6a8c3;
+    --sender-2: #e8956a;
+    --sender-3: #c4b254;
+    --sender-4: #7cb8d4;
+    --sender-5: #a87cd4;
+    --sender-6: #d47c7c;
+
+    --btn-icon-bg:    transparent;
+    --btn-icon-hover: rgba(255,255,255,0.07);
+
+    --scrollbar-thumb: #2b2226;
+    --scrollbar-track: transparent;
+}
+
+
+/* ============================================================
+   SCROLLBAR STYLING (Webkit)
+   ============================================================ */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--scrollbar-track, transparent); }
+::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb, #555);
+    border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover { opacity: 0.8; }

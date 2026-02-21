@@ -1,0 +1,55 @@
+.settings-section {
+    padding: 12px 15px;
+    background-color: transparent;
+    transition: background-color 0.2s ease;
+}
+
+/* Interactive State */
+.settings-section.interactive {
+    cursor: pointer;
+}
+
+.settings-section.interactive:hover {
+    background-color: var(--bg-tertiary);
+}
+
+.section-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+}
+
+.section-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.section-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 4px 0;
+}
+
+.section-desc {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.section-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text-secondary);
+}
+
+.section-arrow {
+    font-size: 20px;
+    font-weight: 300;
+    color: var(--text-secondary);
+    margin-bottom: 2px;
+}

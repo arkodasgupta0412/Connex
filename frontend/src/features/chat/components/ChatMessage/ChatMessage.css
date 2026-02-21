@@ -1,0 +1,132 @@
+/* Container */
+.message-row {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 12px;
+    width: 100%;
+}
+
+.message-row.sent {
+    justify-content: flex-end;
+}
+
+.message-row.received {
+    justify-content: flex-start;
+}
+
+/* System Message */
+.system-message {
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    text-align: center;
+    border: 1px solid var(--border-color);
+    margin: 10px 0;
+    max-width: 80%;
+}
+
+/* Bubble Base */
+.message-bubble {
+    padding: 8px 12px;
+    border-radius: 12px;
+    max-width: 70%;
+    box-shadow: var(--shadow-sm);
+    position: relative;
+    min-width: 140px;
+}
+
+/* Sent vs Received Styling */
+.message-row.sent .message-bubble {
+    background-color: var(--msg-sent);
+    color: var(--text-primary);
+    border-top-right-radius: 0;
+}
+
+.message-row.received .message-bubble {
+    background-color: var(--msg-received);
+    color: var(--text-primary);
+    border-top-left-radius: 0;
+}
+
+/* Sender Name - FIXED CONTRAST */
+.sender-name {
+    font-weight: 700;
+    font-size: 12px;
+    margin-bottom: 4px;
+}
+
+.message-row.sent .sender-name {
+    color: var(--sender-sent);
+}
+
+.message-row.received .sender-name {
+    color: var(--sender-received);
+}
+
+/* Message Content */
+.message-text {
+    font-size: 15px;
+    line-height: 1.4;
+    word-wrap: break-word;
+}
+
+.message-image {
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 400px;
+    border-radius: 8px;
+    display: block;
+    margin-bottom: 5px;
+    cursor: pointer;
+}
+
+.image-caption {
+    font-size: 14px;
+    font-style: italic;
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px solid rgba(0,0,0,0.1);
+    opacity: 0.9;
+}
+
+/* Actions (Like/Comment) */
+.message-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 6px;
+    justify-content: flex-end;
+    opacity: 0.85;
+}
+
+.action-btn {
+    border: none;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.action-btn:hover {
+    background-color: rgba(0,0,0,0.05);
+}
+
+.action-btn.liked {
+    color: var(--danger-color);
+}
+
+/* Time */
+.message-time {
+    font-size: 10px;
+    opacity: 0.7;
+    text-align: right;
+    margin-top: 2px;
+}

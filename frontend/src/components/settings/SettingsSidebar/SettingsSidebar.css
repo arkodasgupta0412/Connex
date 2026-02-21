@@ -1,0 +1,18 @@
+/* THEME SELECTOR */
+.theme-selector-btn {
+    width: 100%;
+    padding: 10px 16px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.theme-selector-btn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
