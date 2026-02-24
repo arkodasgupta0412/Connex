@@ -176,9 +176,7 @@ const AuthForm = ({ onLoginSuccess, theme, onThemeChange }) => {
                     onChange={handleChange} 
                     className="auth-input"
                 />
-                {errors.username && (
-                    <span className="field-error">{errors.username} !</span>
-                )}
+                {errors.username && (<span className="field-error">{errors.username} !</span>)}
             </div>
             
             {/* Password */}
