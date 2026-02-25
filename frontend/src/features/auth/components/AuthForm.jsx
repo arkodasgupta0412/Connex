@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import SettingsButton from '../../../components/settings/SettingsButton/SettingsButton';
 import SettingsSidebar from '../../../components/settings/SettingsSidebar/SettingsSidebar';
-import { API_URL } from '../../../config/index';
+import authService from '../../../services/authService'
 import './AuthForm.css';
 
 
@@ -107,41 +107,31 @@ const AuthForm = ({ onLoginSuccess, theme, onThemeChange }) => {
   };
 
   const handleAuth = async (e) => {
-    if (e) e.preventDefault();
+    if (e) 
+      e.preventDefault();
 
     if (!validateForm()) {
       return;
     }
 
-    const { username, profileName, password, confirmPassword, securityAnswer } = formData;
-    let endpoint = "";
-    let body = { username, securityAnswer };
-
-    if (mode === 'signup') {
-      endpoint = `${API_URL}/signup`;
-      body = { ...body, password, confirmPassword, profileName };
-    } else if (mode === 'login') {
-      endpoint = `${API_URL}/login`;
-      body = { username, password };
-    } else if (mode === 'reset') {
-      endpoint = `${API_URL}/forgot-password`;
-      body = { ...body, newPassword: password, confirmNewPassword: confirmPassword };
-    }
-
     try {
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      });
+      let data;
 
-      const data = await response.json();
+      if (mode === 'signup') {
+        data = await authService.signup(formData);
+      } else if (mode === 'login') {
+        data = await authService.login(formData);
+      }
+      else if (mode === 'reset') {
+        data = await authService.resetPassword(formData);
+      }
 
       if (data.success) {
         setServerMessage({ text: data.message, type: 'success' });
         setErrors({});
+        
         if (mode === 'login' || mode === 'signup') {
-            setTimeout(() => onLoginSuccess(username), 1000);
+            setTimeout(() => onLoginSuccess(formData.username), 1000);
         } else {
             setTimeout(() => switchMode('login'), 1500);
         }
@@ -150,7 +140,8 @@ const AuthForm = ({ onLoginSuccess, theme, onThemeChange }) => {
         setErrors({});
       }
     } catch (error) {
-      setServerMessage({ text: "Server Error. Is the backend running?", type: 'error' });
+      const errorMessage = error.response?.data?.message || "Server Error. Is the backend running?";
+      setServerMessage({ text: errorMessage, type: 'error' });
       setErrors({});
     }
   };
@@ -176,9 +167,7 @@ const AuthForm = ({ onLoginSuccess, theme, onThemeChange }) => {
                     onChange={handleChange} 
                     className="auth-input"
                 />
-                {errors.username && (
-                    <span className="field-error">{errors.username} !</span>
-                )}
+                {errors.username && (<span className="field-error">{errors.username} !</span>)}
             </div>
             
             {/* Password */}
@@ -191,9 +180,7 @@ const AuthForm = ({ onLoginSuccess, theme, onThemeChange }) => {
                     onChange={handleChange} 
                     className="auth-input"
                 />
-                {errors.password && (
-                    <span className="field-error">{errors.password} !</span>
-                )}
+                {errors.password && (<span className="field-error">{errors.password} !</span>)}
             </div>
 
             {/* FORGOT PASSWORD LINK */}

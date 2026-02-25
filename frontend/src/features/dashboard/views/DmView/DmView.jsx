@@ -1,6 +1,6 @@
 import './DMView.css';
 
-const DMView = ({ user }) => {
+const DmView = ({ user }) => {
     return (
         <div className="placeholder-view">
             <h2>Direct Messages</h2>
@@ -8,4 +8,4 @@ const DMView = ({ user }) => {
         </div>
     );
 };
-export default DMView;
+export default DmView;
