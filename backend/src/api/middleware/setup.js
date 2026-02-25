@@ -1,9 +1,9 @@
-const express = require("express");
-const cors = require("cors");
-const bodyParser = require("body-parser");
-const { UPLOAD_DIR } = require("../../config/paths");
+import express from "express";
+import cors from "cors";
+import bodyParser from "body-parser";
+import { UPLOAD_DIR } from "../../config/paths.js";
 
-module.exports = (app) => {
+export default (app) => {
     app.use(cors());
     app.use(bodyParser.json());
     app.use("/uploads", express.static(UPLOAD_DIR));

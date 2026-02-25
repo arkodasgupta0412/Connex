@@ -1,9 +1,9 @@
-const express = require('express');
+import express from 'express';
+import multer from 'multer';
+import { UPLOAD_DIR } from '../../config/paths.js';
+
+
 const router = express.Router();
-const multer = require('multer');
-const { UPLOAD_DIR } = require('../../config/paths')
-
-
 const storage = multer.diskStorage({
     destination: (req, file, cb) => cb(null, UPLOAD_DIR),
     filename: (req, file, cb) => cb(null, Date.now() + "-" + file.originalname)
@@ -20,4 +20,4 @@ router.post('/', upload.single('photo'), (req, res) => {
     res.json({ success: true, photoUrl });
 });
 
-module.exports = router;
+export default router;

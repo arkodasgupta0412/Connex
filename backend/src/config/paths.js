@@ -1,7 +1,9 @@
-const path = require('path');
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-module.exports = {
-    DB_USERS: path.join(__dirname, "../../users.json"),
-    DB_GROUPS: path.join(__dirname, "../../groups.json"),
-    UPLOAD_DIR: path.join(__dirname, "../../uploads")
-};
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+export const DB_USERS = path.join(__dirname, "../../users.json");
+export const DB_GROUPS = path.join(__dirname, "../../groups.json");
+export const UPLOAD_DIR = path.join(__dirname, "../../uploads");

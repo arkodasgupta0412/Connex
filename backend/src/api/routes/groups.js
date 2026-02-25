@@ -1,9 +1,9 @@
-const express = require('express');
-const { v4: uuidv4 } = require('uuid');
-const { readJSON, writeJSON } = require('../../utils/fileOps');
-const { DB_GROUPS } = require('../../config/paths');
+import express from 'express';
+import { v4 as uuidv4 } from 'uuid';
+import { readJSON, writeJSON } from '../../utils/fileOps.js';
+import { DB_GROUPS } from '../../config/paths.js';
 
-module.exports = function(io) {
+export default function(io) {
     const router = express.Router();
 
     router.get('/:username', (req, res) => {
@@ -89,4 +89,4 @@ module.exports = function(io) {
     });
 
     return router;
-};
+}

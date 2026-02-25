@@ -1,6 +1,6 @@
-const fs = require('fs');
+import fs from 'fs';
 
-const readJSON = (file) => {
+export const readJSON = (file) => {
     try {
         return JSON.parse(fs.readFileSync(file, 'utf-8'));
     } catch (error) {
@@ -8,8 +8,6 @@ const readJSON = (file) => {
     }
 };
 
-const writeJSON = (file, data) => {
+export const writeJSON = (file, data) => {
     fs.writeFileSync(file, JSON.stringify(data, null, 2));
 };
-
-module.exports = { readJSON, writeJSON };

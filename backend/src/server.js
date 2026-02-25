@@ -1,10 +1,14 @@
-const express = require("express");
-const http = require("http");
-const { Server } = require("socket.io");
-const fs = require("fs");
-const multer = require("multer");
+import express from 'express';
+import http from 'http';
+import { Server } from 'socket.io';
+import fs from 'fs';
 
-const { UPLOAD_DIR, DB_USERS, DB_GROUPS } = require("./config/paths");
+import { UPLOAD_DIR, DB_USERS, DB_GROUPS } from './config/paths.js';
+import setupMiddleware from './api/middleware/setup.js';
+import authRoutes from './api/routes/auth.js';
+import groupRoutes from './api/routes/groups.js';
+import uploadRoutes from './api/routes/upload.js';
+import setupChatSocket from './services/chatSocket.js';
 
 const app = express();
 const server = http.createServer(app);
@@ -13,34 +17,17 @@ const io = new Server(server, {
     cors: { origin: "*", methods: ["GET", "POST"] }
 });
 
-require("./api/middleware/setup")(app);
+setupMiddleware(app);
 
 if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR);
 if (!fs.existsSync(DB_USERS)) fs.writeFileSync(DB_USERS, "[]");
 if (!fs.existsSync(DB_GROUPS)) fs.writeFileSync(DB_GROUPS, "[]");
 
-const authRoutes = require("./api/routes/auth");
-const groupRoutes = require("./api/routes/groups");
-
 app.use("/", authRoutes);
 app.use("/groups", groupRoutes(io));
+app.use("/upload", uploadRoutes);
 
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => cb(null, UPLOAD_DIR),
-    filename: (req, file, cb) => cb(null, Date.now() + "-" + file.originalname)
-});
-const upload = multer({ storage });
-
-app.post("/upload", upload.single("photo"), (req, res) => {
-    if (!req.file) return res.json({ success: false });
-    
-    const host = req.headers.host; 
-    const photoUrl = `http://${host}/uploads/${req.file.filename}`;
-    
-    res.json({ success: true, photoUrl });
-});
-
-require("./services/chatSocket")(io);
+setupChatSocket(io);
 
 const PORT = 3000;
 server.listen(PORT, "0.0.0.0", () => {

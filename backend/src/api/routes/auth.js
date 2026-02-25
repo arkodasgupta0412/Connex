@@ -1,9 +1,10 @@
 // ---- AUTH ROUTES ----
-const express = require('express');
-const router = express.Router();
-const { readJSON, writeJSON } = require('../../utils/fileOps');
-const { DB_USERS } = require('../../config/paths');
+import express from 'express'
+import { readJSON, writeJSON } from '../../utils/fileOps.js';
+import { DB_USERS } from '../../config/paths.js';
 
+
+const router = express.Router();
 
 // SIGNUP Endpoint
 router.post('/signup', (req, res) => {
@@ -124,4 +125,4 @@ router.post("/logout", (req, res) => {
     });
 })
 
-module.exports = router;
+export default router;
