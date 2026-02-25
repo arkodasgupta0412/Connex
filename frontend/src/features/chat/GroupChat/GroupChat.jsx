@@ -5,8 +5,11 @@ import { v4 as uuidv4 } from 'uuid';
 import ChatHeader from '../components/ChatHeader/ChatHeader';
 import ChatInput from '../components/ChatInput/ChatInput';
 import ChatMessage from '../components/ChatMessage/ChatMessage'; 
+import groupService from '../../../services/groupService';
+import uploadService from '../../../services/uploadService';
 import { API_URL } from  '../../../config/index'; 
 import './GroupChat.css'; 
+
 
 const socket = io.connect(API_URL, {
     reconnection: true,
@@ -27,7 +30,6 @@ const GroupChat = ({ user, group, onBack, theme }) => {
     const [uploadedImageUrl, setUploadedImageUrl] = useState(null);
     const messagesEndRef = useRef(null);
 
-    // Notice: fileInputRef is removed from here because ChatInput.jsx handles it!
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -40,18 +42,18 @@ const GroupChat = ({ user, group, onBack, theme }) => {
     useEffect(() => {
         socket.emit("join_group", group.id);
 
+
         const fetchHistory = async () => {
             try {
-                const res = await fetch(`${API_URL}/groups/${user}`);
-                if (!res.ok) throw new Error('Failed to fetch groups');
-                const data = await res.json();
-                const freshGroup = [...data.userGroups, ...data.otherGroups].find(g => g.id === group.id);
+                const data = await groupService.fetchAllGroups(user);
+                const freshGroup = [...(data.userGroups || []), ...(data.otherGroups || [])].find(g => g.id === group.id);
                 if (freshGroup && freshGroup.messages) {
                     setMessages(freshGroup.messages);
                 }
-            } catch (err) { }
+            } catch (err) { console.error(err); }
         };
         fetchHistory();
+
 
         const handleReceiveMsg = (data) => {
             if(data.groupId !== group.id) return;
@@ -60,6 +62,7 @@ const GroupChat = ({ user, group, onBack, theme }) => {
                 return [...prev, data];
             });
         };
+
 
         const handleUpdateComments = ({ messageId, comment }) => {
             setMessages((prev) => prev.map(msg => {
@@ -71,6 +74,7 @@ const GroupChat = ({ user, group, onBack, theme }) => {
             }));
         };
 
+
         const handleUpdateLikes = ({ messageId, likes, likedBy }) => {
             setMessages((prev) => prev.map(msg => {
                 if (msg.id === messageId) {
@@ -79,6 +83,7 @@ const GroupChat = ({ user, group, onBack, theme }) => {
                 return msg;
             }));
         };
+
 
         socket.on("receive_message", handleReceiveMsg);
         socket.on("update_comments", handleUpdateComments);
@@ -111,15 +116,13 @@ const GroupChat = ({ user, group, onBack, theme }) => {
         socket.emit("send_message", msgData);
     };
 
+
     const handleFileUpload = async (event) => {
         const file = event.target.files[0];
         if (!file) return;
-        const formData = new FormData();
-        formData.append("photo", file);
 
         try {
-            const res = await fetch(`${API_URL}/upload`, { method: "POST", body: formData });
-            const data = await res.json();
+            const data = await uploadService.uploadImage(file);
             if (data.success) {
                 setUploadedImageUrl(data.photoUrl);
                 setShowCaptionModal(true);
@@ -129,6 +132,7 @@ const GroupChat = ({ user, group, onBack, theme }) => {
             alert("Upload failed");
         }
     };
+
 
     const sendPhotoWithCaption = () => {
         if (!uploadedImageUrl) return;
@@ -153,6 +157,7 @@ const GroupChat = ({ user, group, onBack, theme }) => {
         setUploadedImageUrl(null);
         setCaptionText("");
     };
+
 
     const sendComment = (messageId, text) => {
         socket.emit("add_comment", { 

@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import GroupSidebar from './GroupSidebar/GroupSidebar';
 import GroupChat from '../../../chat/GroupChat/GroupChat';
 import GroupModal from './GroupModal/GroupModal';
-import { API_URL } from '../../../../config/index'; 
+import groupService from '../../../../services/groupService';
 import './GroupView.css';
 
 const GroupView = ({ user, theme }) => {
@@ -13,54 +13,53 @@ const GroupView = ({ user, theme }) => {
     const [showCreateModal, setShowCreateModal] = useState(false);
 
     useEffect(() => {
-        fetchGroups();
-    }, []);
+        if (user) {
+            fetchGroups();
+        }
+    }, [user]);
+
 
     const fetchGroups = async () => {
         try {
-            const res = await fetch(`${API_URL}/groups/${user}`);
-            const data = await res.json();
+            const data = await groupService.fetchAllGroups(user);
             setUserGroups(data.userGroups);
             setAllGroups(data.otherGroups);
         } catch (e) { console.error("Fetch error", e); }
     };
 
+
     const handleCreateGroup = async (newGroupName) => {
-        await fetch(`${API_URL}/groups/create`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ groupName: newGroupName, creator: user })
-        });
-        fetchGroups();
+        try {
+            await groupService.createGroup(newGroupName, user);
+            fetchGroups();
+        } catch (e) { console.error(e); }
     };
+
 
     const handleRequestJoin = async (groupId) => {
-        await fetch(`${API_URL}/groups/request`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ groupId, username: user })
-        });
-        alert("Request sent!");
-        fetchGroups();
+        try {
+            await groupService.requestJoin(groupId, user);
+            alert("Request sent!");
+            fetchGroups();
+        } catch (e) { console.error(e); }
     };
+
 
     const handleAcceptRequest = async (groupId, username) => {
-        await fetch(`${API_URL}/groups/request/accept`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ groupId, username })
-        });
-        fetchGroups();
+        try {
+            await groupService.acceptRequest(groupId, username);
+            fetchGroups();
+        } catch (e) { console.error(e); }
     };
 
+
     const handleRejectRequest = async (groupId, username) => {
-        await fetch(`${API_URL}/groups/request/reject`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ groupId, username })
-        });
-        fetchGroups();
+        try {
+            await groupService.rejectRequest(groupId, username);
+            fetchGroups();
+        } catch (e) { console.error(e); }
     };
+
 
     return (
         <div className="group-view-container">
