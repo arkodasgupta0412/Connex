@@ -1,0 +1,175 @@
+/* Dark Overlay Background */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.75);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 99999;
+}
+
+/* The Modal Box */
+.user-settings-modal {
+    background-color: var(--bg-secondary, #2B2D31);
+    width: 100%;
+    max-width: 500px;
+    border-radius: 8px;
+    overflow: hidden; 
+    position: relative;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    display: flex;
+    flex-direction: column;
+}
+
+/* --- BANNER STYLING --- */
+.banner-container {
+    width: 100%;
+    height: 120px;
+    background-color: #5865F2; 
+    position: relative;
+}
+
+.banner-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.banner-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255,255,255,0.5);
+    font-size: 14px;
+}
+
+/* NEW: Banner Camera Overlay */
+.banner-upload-overlay {
+    position: absolute;
+    inset: 0; /* Shorthand for top:0, left:0, bottom:0, right:0 */
+    background-color: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    cursor: pointer;
+    transition: opacity 0.2s ease-in-out;
+    z-index: 2;
+}
+
+.banner-container:hover .banner-upload-overlay {
+    opacity: 1;
+}
+
+
+/* --- FIXED AVATAR & NEW STATUS BADGE --- */
+.avatar-container {
+    position: absolute;
+    top: 76px; 
+    left: 20px;
+    width: 88px;
+    height: 88px;
+    z-index: 5;
+    pointer-events: none; /* prevent blocking form fields below */
+}
+
+.avatar-wrapper {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 6px solid var(--bg-secondary, #2B2D31); 
+    background-color: var(--bg-primary, #1E1F22);
+    position: relative;
+    overflow: hidden; 
+    pointer-events: auto; /* re-enable clicks only on the avatar itself */
+}
+
+.avatar-img, .avatar-placeholder {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.avatar-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    font-weight: bold;
+    color: white;
+    background-color: #4752C4; 
+}
+
+/* FIXED: Hover overlay for Avatar */
+.avatar-upload {
+    position: absolute;
+    inset: 0;
+    background-color: rgba(0,0,0,0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    cursor: pointer;
+    transition: opacity 0.2s ease-in-out;
+}
+
+.avatar-wrapper:hover .avatar-upload {
+    opacity: 1;
+}
+
+/* The tiny status icon */
+.status-badge {
+    position: absolute;
+    bottom: -5px;
+    right: -10px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 4px solid var(--bg-secondary, #FFFFFF); 
+    z-index: 10;
+    transition: background-color 0.3s ease;
+    pointer-events: none; /* purely decorative */
+}
+
+.status-badge.online { background-color: #23a559; }
+.status-badge.idle { background-color: #f0b232; }
+.status-badge.dnd { background-color: #f23f43; }
+.status-badge.invisible { background-color: #80848e; }
+
+/* --- FIXED FORM LAYOUT --- */
+.form-content {
+    padding: 70px 32px 16px; 
+    display: flex;
+    flex-direction: column;
+    gap: 20px; 
+}
+
+.modal-actions {
+    padding: 24px 32px;
+    background-color: var(--bg-tertiary, #232428);
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+/* Status Messages */
+.message {
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 4px;
+    font-size: 13px;
+    text-align: center;
+    font-weight: 500;
+}
+
+.message.success { background-color: rgba(45, 199, 112, 0.15); color: #2dc770; }
+.message.error { background-color: rgba(237, 66, 69, 0.15); color: #ed4245; }
+.message.info { background-color: rgba(88, 101, 242, 0.15); color: #5865F2; }

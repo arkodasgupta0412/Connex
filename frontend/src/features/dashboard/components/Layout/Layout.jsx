@@ -40,6 +40,7 @@ const Layout = ({ user, onLogout, theme, onThemeChange }) => {
                 onClose={() => setShowSettings(false)}
                 theme={theme}
                 onThemeChange={onThemeChange}
+                currentUser={user}
                 onLogout={onLogout}
             />
         </div>
