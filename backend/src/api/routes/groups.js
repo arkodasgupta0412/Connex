@@ -31,6 +31,7 @@ export default function(io) {
                     otherGroups.push(g);
                 }
             }
+            res.json({ userGroups, otherGroups });
 
         } catch (error) {
             console.error("Fetch Groups Error:", err);
