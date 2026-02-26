@@ -39,7 +39,7 @@ router.patch('/:username/profile', async (req, res) => {
                     ...(bio !== undefined && { bio })
                 }
             },
-            { new: true }
+            { returnDocument: 'after' }
         );
 
         if (!updatedUser) {
@@ -55,3 +55,5 @@ router.patch('/:username/profile', async (req, res) => {
         res.status(500).json({ success: false, message: "Server Error" });
     }
 });
+
+export default router;
