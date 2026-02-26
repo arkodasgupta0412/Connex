@@ -1,88 +1,69 @@
-// ---- AUTH ROUTES ----
-import express from 'express'
-import { readJSON, writeJSON } from '../../utils/fileOps.js';
-import { DB_USERS } from '../../config/paths.js';
+import express from 'express';
+import User from '../../models/User.js';
 
 
 const router = express.Router();
 
 // SIGNUP Endpoint
-router.post('/signup', (req, res) => {
-    const { username, password, confirmPassword, securityAnswer, profileName } = req.body;
-    const users = readJSON(DB_USERS);
-    
-    if (users.find(user => user.username == username)) {
-        return res.json({
-            success : false,
-            message: "User already exists!"
+router.post('/signup', async (req, res) => {
+
+    try {
+        const { username, password, confirmPassword, securityAnswer, profileName } = req.body;
+
+        const existingUser = await User.findOne({ username: username });
+        if (existingUser) {
+            return res.json({
+                success : false,
+                message: "User already exists!"
+            });
+        }
+
+        if (confirmPassword !== password) {
+            return res.json({
+                success : false,
+                message : "Passwords do not match!"
+            });
+        }
+
+        if (!securityAnswer || !profileName) {
+            return res.json({
+                success : false,
+                message : "Please fill in all required fields!"
+            });
+        }
+
+
+        const newUser = new User({
+            username,
+            password,
+            securityAnswer,
+            profileName
+        });
+
+        await newUser.save();
+
+        res.json({
+            success : true,
+            message: "Register successful"
+        });
+
+    } catch (error) {
+        console.error("Signup Error:", error);
+        res.status(500).json({ 
+            success: false, 
+            message: "Internal server error"
         });
     }
-
-    if (confirmPassword != password) {
-        return res.json({
-            success : false,
-            message : "Passwords do not match!"
-        });
-    }
-
-    if (!securityAnswer) {
-        return res.json({
-            success : false,
-            message : "Please enter a security answer!"
-        });
-    }
-
-    if (!profileName) {
-        return res.json({
-            success : false,
-            message : "Please enter a profile name!"
-        });
-    }
-
-    users.push({ username, password, securityAnswer, profileName })
-    writeJSON(DB_USERS, users);
-
-    res.json({
-        success : true,
-        message: "Register successful"
-    });
 });
 
 
 // LOGIN endpoint
-router.post("/login", (req, res) => {
-    const { username, password } = req.body
-    const users = readJSON(DB_USERS);
+router.post("/login", async (req, res) => {
 
-    const user = users.find(user => user.username == username);
-
-    if (!user) {
-        return res.json({
-            success: false,
-            message: "Username not found!"
-        });
-    }
-
-    if (user.password != password) {
-        return res.json({
-            success: false,
-            message: "Incorrect Password!"
-        });
-    }
-
-    res.json({
-        success: true,
-        message: "Login successful"
-    })
-})
-
-
-// FORGOT-PASSWORD endpoint
-router.post("/forgot-password", (req, res) => {
-        const { username, newPassword, confirmNewPassword, securityAnswer } = req.body;
-        const users = readJSON(DB_USERS);
-
-        const user = users.find(user => user.username == username);
+    try {
+        const { username, password } = req.body
+        
+        const user = await User.findOne({ username: username });
 
         if (!user) {
             return res.json({
@@ -91,30 +72,73 @@ router.post("/forgot-password", (req, res) => {
             });
         }
 
-        if (user.securityAnswer != securityAnswer) {
+        if (user.password !== password) {
             return res.json({
                 success: false,
-                message: "Security answer is incorrect!"
+                message: "Incorrect Password!"
             });
         }
 
+        res.json({
+            success: true,
+            message: "Login successful"
+        });
 
-        if (confirmNewPassword != newPassword) {
+    } catch (error) {
+        console.error("Login Error:", error);
+        res.status(500).json({ 
+            success: false, 
+            message: "Internal server error"
+        });
+    }
+});
+
+
+// FORGOT-PASSWORD endpoint
+router.post("/forgot-password", async (req, res) => {
+    
+    try {
+        const { username, newPassword, confirmNewPassword, securityAnswer } = req.body;
+        
+        const user = await User.findOne({ username: username });
+
+        if (!user) {
+            return res.json({
+                success: false,
+                message: "Username not found!"
+            });
+        }
+
+        if (confirmNewPassword !== newPassword) {
             return res.json({
                 success : false,
                 message : "Passwords do not match!"
             });
         }
 
-        user.password = newPassword
-        writeJSON(DB_USERS, users);
+        if (user.securityAnswer !== securityAnswer) {
+            return res.json({
+                success: false,
+                message: "Security answer is incorrect!"
+            });
+        } 
+
+        user.password = newPassword;
+        await user.save();
 
         return res.json({
             success : true,
             message : "Password reset successful!"
         });
 
-})
+    } catch (error) {
+        console.error("Forgot Password Error:", error);
+        res.status(500).json({ 
+            success: false, 
+            message: "Internal server error"
+        });
+    }
+});
 
 
 // LOGOUT endpoint
@@ -123,6 +147,6 @@ router.post("/logout", (req, res) => {
         success: true,
         message: "Logout successful"
     });
-})
+});
 
 export default router;
