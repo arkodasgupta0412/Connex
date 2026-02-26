@@ -21,7 +21,7 @@ const uploadSchema = new Schema({
     filename: { type: String, required: true },
     originalName: { type: String, required: true },
     fileUrl: { type: String, required: true },
-    fileType: { type: String, enum: ['image', 'video', 'document', 'link'], default: 'image' },
+    fileType: { type: String, enum: ['image', 'video', 'audio', 'document', 'link', 'other'], default: 'image' },
     mimeType: { type: String, required: true },
     size: { type: Number, required: true }
 
