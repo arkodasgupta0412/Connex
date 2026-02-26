@@ -122,7 +122,7 @@ const GroupChat = ({ user, group, onBack, theme }) => {
         if (!file) return;
 
         try {
-            const data = await uploadService.uploadImage(file);
+            const data = await uploadService.uploadChatImage(file);
             if (data.success) {
                 setUploadedImageUrl(data.photoUrl);
                 setShowCaptionModal(true);
