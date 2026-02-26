@@ -8,7 +8,6 @@ export default function(io) {
 
     // Get all groups for a user
     router.get('/:username', async (req, res) => {
-        
         try {
             const allGroups = await Group.find().lean();
             const userGroups = [];
@@ -32,6 +31,7 @@ export default function(io) {
                     otherGroups.push(g);
                 }
             }
+            res.json({ userGroups, otherGroups });
 
         } catch (error) {
             console.error("Fetch Groups Error:", err);
