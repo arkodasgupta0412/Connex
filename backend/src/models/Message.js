@@ -10,7 +10,7 @@ const commentSchema = new Schema({
 
 const messageSchema = new Schema({
 
-    groupId: { type: mongoose.Schema.Types.ObjectId, ref: 'Group', required: true },
+    groupId: { type: Schema.Types.ObjectId, ref: 'Group', required: true },
     
     sender: { type: String, required: true },
     type: { type: String, enum: ['text', 'photo', 'system'], default: 'text' },
