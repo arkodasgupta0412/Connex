@@ -8,6 +8,7 @@ export default function(io) {
 
     // Get all groups for a user
     router.get('/:username', async (req, res) => {
+        
         try {
             const allGroups = await Group.find().lean();
             const userGroups = [];
