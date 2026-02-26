@@ -265,11 +265,7 @@ const AuthForm = ({ onLoginSuccess, theme, onThemeChange }) => {
                 </div>
             )}
 
-            <button type="submit"
-                    onClick={handleAuth} 
-                    onKeyDown={(e) => e.key === 'Enter' && handleAuth()} 
-                    className="btn-submit"
-            >
+            <button type="submit" className="btn-submit">
                 {mode === 'login' ? 'SIGN IN' : mode === 'signup' ? 'SIGN UP' : 'RESET PASSWORD'}
             </button>
 
