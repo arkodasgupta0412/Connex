@@ -209,9 +209,6 @@ const GroupChat = ({ user, group, onBack, theme }) => {
             {showCaptionModal && (
                 <div className="caption-modal-overlay">
                     <div className="caption-modal">
-                        <h3 className="caption-title">
-                            Add a caption (optional)
-                        </h3>
                         
                         {uploadedImageUrl && (
                             <img 

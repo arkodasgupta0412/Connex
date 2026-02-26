@@ -19,7 +19,9 @@ const messageSchema = new Schema({
 
     likes: { type: Number, default: 0 },
     likedBy: [{ type: String }],
-    comments: [commentSchema]
+    comments: [commentSchema],
+
+    timestamp: { type: Date, default: Date.now }
 
 }, { timestamps: true });
 
