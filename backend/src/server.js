@@ -17,8 +17,9 @@ import { UPLOAD_DIR, DB_USERS, DB_GROUPS } from './config/paths.js';
 import setupMiddleware from './api/middleware/setup.js';
 import authRoutes from './api/routes/auth.js';
 import groupRoutes from './api/routes/groups.js';
-import uploadRoutes from './api/routes/upload.js';
+import uploadRoutes from './api/routes/uploads.js';
 import setupChatSocket from './services/chatSocket.js';
+import userRoutes from './api/routes/users.js';
 
 const app = express();
 const server = http.createServer(app);
@@ -38,6 +39,7 @@ if (!fs.existsSync(DB_GROUPS)) fs.writeFileSync(DB_GROUPS, "[]");
 app.use("/", authRoutes);
 app.use("/groups", groupRoutes(io));
 app.use("/upload", uploadRoutes);
+app.use("/users", userRoutes);
 
 setupChatSocket(io);
 

@@ -14,7 +14,7 @@ const uploadSchema = new Schema({
     
     context: { 
         type: String, 
-        enum: ['chat_media', 'group_avatar', 'user_avatar'], 
+        enum: ['chat_media', 'user_avatar', 'user_banner'], 
         default: 'chat_media' 
     },
 
