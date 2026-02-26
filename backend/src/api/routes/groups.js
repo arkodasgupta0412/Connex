@@ -1,90 +1,142 @@
 import express from 'express';
-import { v4 as uuidv4 } from 'uuid';
-import { readJSON, writeJSON } from '../../utils/fileOps.js';
-import { DB_GROUPS } from '../../config/paths.js';
+import Group from '../../models/Group.js';
+import Message from '../../models/Message.js';
+
 
 export default function(io) {
     const router = express.Router();
 
-    router.get('/:username', (req, res) => {
-        const groups = readJSON(DB_GROUPS);
-        const userGroups = groups.filter(g => g.members.includes(req.params.username));
-        const otherGroups = groups.filter(g => !g.members.includes(req.params.username));
-        res.json({ userGroups, otherGroups });
-    });
+    // Get all groups for a user
+    router.get('/:username', async (req, res) => {
+        try {
+            const allGroups = await Group.find().lean();
+            const userGroups = [];
+            const otherGroups = [];
 
-    router.post('/create', (req, res) => {
-        const groups = readJSON(DB_GROUPS);
-        const newGroup = {
-            id: uuidv4(),
-            name: req.body.groupName,
-            admins: [req.body.creator],
-            members: [req.body.creator],
-            joinRequests: [],
-            messages: []
-        };
-        groups.push(newGroup);
-        writeJSON(DB_GROUPS, groups);
-        res.json({ success: true });
-    });
+            for (let g of allGroups) {
+                g.id = g._id.toString();
 
-    router.post('/request', (req, res) => {
-        const groups = readJSON(DB_GROUPS);
-        const group = groups.find(g => g.id === req.body.groupId);
-        if (group && !group.members.includes(req.body.username)) {
-            if(!group.joinRequests.includes(req.body.username)) {
-                group.joinRequests.push(req.body.username);
-            }
-            writeJSON(DB_GROUPS, groups);
-        }
-        res.json({ success: true });
-    });
+                // Messages fetch for group g
+                const msgs = await Message.find({ groupId: g._id }).lean();
+                g.messages = msgs.map(m => ({
+                    ...m,
+                    id: m._id.toString(),
+                    groupId: m.groupId.toString()
+                }));
 
-    router.post('/request/accept', (req, res) => {
-        const { groupId, username } = req.body;
-        const groups = readJSON(DB_GROUPS);
-        const group = groups.find(g => g.id === groupId);
-        
-        if (group && group.joinRequests.includes(username)) {
-            group.joinRequests = group.joinRequests.filter(u => u !== username);
-            if (!group.members.includes(username)) {
-                group.members.push(username);
+                if (g.members.includes(req.params.username)) {
+                    userGroups.push(g);
+                }
+                else {
+                    otherGroups.push(g);
+                }
             }
-            
-            const joinMessage = {
-                id: uuidv4(),
-                groupId: groupId,
-                sender: 'SYSTEM',
-                type: 'system',
-                content: `${username} joined the group`,
-                timestamp: new Date().toISOString(),
-                comments: [],
-                likes: 0,
-                likedBy: []
-            };
-            group.messages.push(joinMessage);
-            writeJSON(DB_GROUPS, groups);
-            
-            if (io && typeof io.to === 'function') {
-                io.to(groupId).emit('receive_message', joinMessage);
-            }
-            res.json({ success: true, message: 'User accepted' });
-        } else {
-            res.json({ success: false, message: 'Request not found' });
+
+        } catch (error) {
+            console.error("Fetch Groups Error:", err);
+            res.status(500).json({ error: "Server error" });
         }
     });
 
-    router.post('/request/reject', (req, res) => {
-        const { groupId, username } = req.body;
-        const groups = readJSON(DB_GROUPS);
-        const group = groups.find(g => g.id === groupId);
-        
-        if (group && group.joinRequests.includes(username)) {
-            group.joinRequests = group.joinRequests.filter(u => u !== username);
-            writeJSON(DB_GROUPS, groups);
+
+    // CREATE a new group
+    router.post('/create', async (req, res) => {
+        try {
+            const { groupName, creator } = req.body;
+
+            const newGroup = new Group({
+                name: groupName,
+                admins: [creator],
+                members: [creator]
+            });
+            
+            await newGroup.save();
+            res.json({ success : true });
+
+        } catch (error) {
+            console.error("Create Group Error:", err);
+            res.status(500).json({ success: false });
+        }
+    });
+
+
+    // REQUEST to JOIN a group
+    router.post('/request', async (req, res) => {
+        try {
+            const { groupId, username } = req.body;
+
+            await Group.findByIdAndUpdate(groupId, {
+                $addToSet: { joinRequests: username }
+            })
+            res.json({ success: true });
+
+        } catch (error) {
+            console.error("Request Join Error:", err);
+            res.status(500).json({ success: false });
+        }
+    });
+
+
+    // REQUEST accept by admin
+    router.post('/request/accept', async (req, res) => {
+        try {
+            const { groupId, username } = req.body;
+            const group = await Group.findById(groupId);
+
+            if (group && group.joinRequests.includes(username)) {
+
+                // Move from requests to members
+                group.joinRequests = group.joinRequests.filter(u => u !== username);
+                if (!group.members.includes(username)) {
+                    group.members.push(username);
+                }
+                await group.save();
+
+                // Create the system welcome message
+                const joinMessage = new Message({
+                    groupId: group._id,
+                    sender: 'SYSTEM',
+                    type: 'system',
+                    content: `${username} joined the group`
+                });
+                await joinMessage.save();
+
+                // Emit socket event
+                const msgData = {
+                    ...joinMessage.toObject(),
+                    id: joinMessage._id.toString(),
+                    groupId: joinMessage.groupId.toString()
+                };
+
+                if (io && typeof io.to === 'function') {
+                    io.to(groupId).emit('receive_message', msgData);
+                }
+                res.json({ success: true, message: 'User accepted' });
+
+            } else {
+                res.json({ success: false, message: 'Request not found' });
+            }
+
+        } catch (err) {
+            console.error("Accept Request Error:", err);
+            res.status(500).json({ success: false });
+        }
+    });
+
+
+    // REQUEST reject by admin
+    router.post('/request/reject', async (req, res) => {
+        try {
+            const { groupId, username } = req.body;
+
+            await Group.findByIdAndUpdate(groupId, {
+                $pull: { joinRequests: username }
+            });
             res.json({ success: true, message: 'User rejected' });
-        } else {
-            res.json({ success: false, message: 'Request not found' });
+
+        } catch (err) {
+            console.error("Reject Request Error:", err);
+            res.status(500).json({ success: false });
         }
     });
 
