@@ -1,0 +1,197 @@
+/* --- MODAL PAPER OVERRIDES --- */
+.action-modal-paper {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+    width: 100%;
+    max-width: 450px !important;
+    border-radius: 8px !important;
+    background-image: none !important;
+}
+
+/* --- HEADER & CLOSE BUTTON --- */
+.action-modal-header {
+    margin: 0;
+    padding: 16px 24px 8px 24px !important;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.action-modal-title-text {
+    font-weight: bold;
+    font-size: 1.25rem;
+}
+
+.action-modal-close-btn {
+    color: var(--text-secondary) !important;
+}
+
+.action-modal-close-btn:hover {
+    color: var(--danger-color) !important;
+}
+
+/* --- TABS --- */
+.action-modal-tabs-container {
+    border-bottom: 1px solid var(--border-color);
+    padding: 0 16px;
+}
+
+.action-modal-tab {
+    color: var(--text-secondary) !important;
+    font-weight: bold !important;
+}
+
+.action-modal-tab.Mui-selected {
+    color: #5865F2 !important;
+}
+
+.action-modal-tabs-container .MuiTabs-indicator {
+    background-color: #5865F2;
+}
+
+/* --- CONTENT AREA --- */
+.action-modal-content {
+    padding: 0 24px 24px 24px !important;
+}
+
+/* --- GLOBAL MESSAGES --- */
+.modal-message {
+    padding: 10px;
+    border-radius: 6px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    font-size: 14px;
+    text-align: center;
+    font-weight: 500;
+}
+
+.modal-message.success {
+    background-color: rgba(35, 165, 89, 0.1);
+    color: #23a559;
+    border: 1px solid rgba(35, 165, 89, 0.3);
+}
+
+.modal-message.error {
+    background-color: rgba(242, 63, 67, 0.1);
+    color: #f23f43;
+    border: 1px solid rgba(242, 63, 67, 0.3);
+}
+
+/* --- CUSTOM MUI INPUT STYLES --- */
+.action-modal-input {
+    margin-bottom: 24px !important;
+}
+
+.action-modal-input .MuiOutlinedInput-root {
+    color: var(--text-primary);
+    background-color: var(--bg-tertiary);
+}
+
+.action-modal-input .MuiOutlinedInput-root fieldset {
+    border-color: var(--border-color);
+}
+
+.action-modal-input .MuiOutlinedInput-root:hover fieldset {
+    border-color: var(--text-secondary);
+}
+
+.action-modal-input .MuiOutlinedInput-root.Mui-focused fieldset {
+    border-color: #5865F2;
+}
+
+.action-modal-input .MuiInputLabel-root {
+    color: var(--text-secondary);
+}
+
+.action-modal-input .MuiInputLabel-root.Mui-focused {
+    color: #5865F2;
+}
+
+/* --- BUTTONS --- */
+.action-btn-create {
+    background-color: #5865F2 !important;
+    color: white !important;
+    padding: 12px 0 !important;
+}
+
+.action-btn-create:hover {
+    background-color: #4752C4 !important;
+}
+
+.action-btn-join {
+    background-color: #23a559 !important;
+    color: white !important;
+}
+
+.action-btn-join:hover {
+    background-color: #1a7c43 !important;
+}
+
+.action-btn-search {
+    color: var(--text-primary) !important;
+    border-color: var(--border-color) !important;
+}
+
+.action-btn-search:hover {
+    background-color: rgba(88, 101, 242, 0.08) !important;
+    border-color: var(--text-secondary) !important;
+}
+
+/* --- JOIN TAB LAYOUT --- */
+.join-section-title {
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.join-input-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+}
+
+.join-input-row .action-modal-input {
+    margin-bottom: 0 !important;
+}
+
+.divider-text {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
+.action-modal-divider {
+    border-color: var(--border-color) !important;
+    margin: 16px 0 !important;
+}
+
+/* --- SEARCH RESULTS --- */
+.search-results-list {
+    background-color: var(--bg-tertiary) !important;
+    border-radius: 4px;
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+.search-result-item {
+    border-bottom: 1px solid var(--border-color) !important;
+}
+
+.search-result-item:last-child {
+    border-bottom: none !important;
+}
+
+.search-result-primary {
+    color: var(--text-primary) !important;
+    font-weight: bold !important;
+}
+
+.search-result-secondary {
+    color: var(--text-secondary) !important;
+}
+
+.request-join-icon {
+    color: #5865F2 !important;
+}
