@@ -7,12 +7,20 @@ const groupService = {
     },
 
 
-    createGroup: async (groupName, createrUsername) => {
-        const payload = {
-            groupName: groupName,
-            creator: createrUsername
-        };
-        const response = await api.post('/groups/create', payload);
+    createGroup: async (groupData) => {
+        const response = await api.post('/groups/create', groupData);
+        return response.data;
+    },
+
+
+    searchGroups: async (query) => {
+        const response = await api.get(`/groups/search/public?q=${query}`);
+        return response.data;
+    },
+
+
+    joinByCode: async (code, username) => {
+        const response = await api.post('/groups/join/code', { code, username });
         return response.data;
     },
 
