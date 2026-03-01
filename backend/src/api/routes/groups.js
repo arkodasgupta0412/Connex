@@ -93,12 +93,16 @@ export default function(io) {
         try {
             const { name, groupName, description, creator } = req.body;
 
+            const userDoc = await User.findOne({ username: creator });
+            const initialNickname = userDoc ? userDoc.profileName : creator;
+
             const newGroup = new Group({
                 name: groupName || name,
                 description: description || "",
                 owner: creator,
                 admins: [creator],
                 members: [creator],
+                nicknames: { [creator]: initialNickname },
                 permissions: { membersCanEditGroupInfo: false }
             });
             
@@ -165,15 +169,23 @@ export default function(io) {
     // REQUEST accept by admin
     router.post('/request/accept', async (req, res) => {
         try {
-            const { groupId, username } = req.body;
+            const { groupId, username, adminUsername } = req.body;
             const group = await Group.findById(groupId);
 
             if (group && group.joinRequests.includes(username)) {
+
+                const targetUser = await User.findOne({ username: username });
 
                 // Move from requests to members
                 group.joinRequests = group.joinRequests.filter(u => u !== username);
                 if (!group.members.includes(username)) {
                     group.members.push(username);
+
+                    if (targetUser && targetUser.profileName) {
+                        group.nicknames.set(username, targetUser.profileName);
+                    } else {
+                        group.nicknames.set(username, username);
+                    }
                 }
                 await group.save();
 
@@ -194,13 +206,17 @@ export default function(io) {
                 };
 
                 if (io && typeof io.to === 'function') {
+                    
                     io.to(groupId).emit('receive_message', msgData); 
+                    const notifText = `${adminUsername || 'An admin'} accepted your join request to ${group.name}`;
+                    
+                    if (targetUser) {
+                        targetUser.notifications.push({ text: notifText });
+                        await targetUser.save();
+                    }
 
                     io.to(username).emit('added_to_group');          
-                    io.to(username).emit('new_notification', { 
-                        type: 'success', 
-                        text: `Your request to join ${group.name} was accepted!` 
-                    });
+                    io.to(username).emit('new_notification', { text: notifText });
                     
                     group.admins.forEach(admin => {
                         io.to(admin).emit('group_updated');
@@ -222,17 +238,23 @@ export default function(io) {
     // REQUEST reject by admin
     router.post('/request/reject', async (req, res) => {
         try {
-            const { groupId, username } = req.body;
+            const { groupId, username, adminUsername } = req.body;
 
             const group = await Group.findByIdAndUpdate(groupId, {
                 $pull: { joinRequests: username }
             });
 
             if (group && io && typeof io.to === 'function') {
-                io.to(username).emit('new_notification', { 
-                    type: 'error', 
-                    text: `Your request to join ${group.name} was declined.` 
-                });
+
+                const targetUser = await User.findOne({ username: username });
+                const notifText = `${adminUsername || 'An admin'} rejected your join request to ${group.name}`;
+                
+                if (targetUser) {
+                    targetUser.notifications.push({ text: notifText });
+                    await targetUser.save();
+                }
+
+                io.to(username).emit('new_notification', { text: notifText });
                 
                 group.admins.forEach(admin => {
                     io.to(admin).emit('group_updated');
