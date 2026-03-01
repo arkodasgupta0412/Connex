@@ -1,13 +1,12 @@
 import { useState } from 'react';
-import { Badge } from '@mui/material'; // <--- Ensure Badge is imported
+import { Badge } from '@mui/material';
 
 import Sidebar from '../../components/sidebar/Sidebar';
 import SettingsSection from '../../components/settings/SettingsSection/SettingsSection';
 import ThemeModal from '../../components/settings/ThemeModal/ThemeModal';
 import UserSettings from '../../components/settings/UserSettings/UserSettings';
-import NotificationModal from './NotificationModal';
+import NotificationModal from './NotificationModal'; 
 import './AppSettings.css';
-
 
 const AppSettings = ({ 
     isOpen, onClose, theme, onThemeChange, currentUser, onLogout, 
@@ -17,10 +16,9 @@ const AppSettings = ({
     const [accountModalOpen, setAccountModalOpen] = useState(false);
     const [notificationsModalOpen, setNotificationsModalOpen] = useState(false);
 
-
     const handleNotificationsClick = () => {
-        if (onOpenNotifications) onOpenNotifications();
-        setNotificationsModalOpen(true);
+        if (onOpenNotifications) onOpenNotifications(); 
+        setNotificationsModalOpen(true); 
     };
     
     return (
@@ -34,16 +32,19 @@ const AppSettings = ({
                         showArrow={true}
                     />
 
-                    
                     <SettingsSection 
                         title={
-                            <div className="settings-badge-wrapper">
+                            <Badge 
+                                color="error" 
+                                variant="dot" 
+                                invisible={!hasUnseen}
+                                sx={{ '& .MuiBadge-badge': { right: -14, top: 6 } }}
+                            >
                                 Notifications
-                                <Badge color="error" variant="dot" invisible={!hasUnseen} />
-                            </div>
+                            </Badge>
                         }
                         description="Configure alerts and sounds"
-                        onClick={handleNotificationsClick}
+                        onClick={handleNotificationsClick} 
                         showArrow={true}
                     />
                     
@@ -74,7 +75,6 @@ const AppSettings = ({
                 username={currentUser} 
             />
 
-            {/* 4. RENDERING NOTIFICATION MODAL */}
             <NotificationModal
                 isOpen={notificationsModalOpen}
                 onClose={() => setNotificationsModalOpen(false)}

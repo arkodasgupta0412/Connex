@@ -157,7 +157,7 @@ const GroupSettingsModal = ({ isOpen, onClose, group, currentUser, onLeaveGroup,
     };
 
     const currentAvatar = removeAvatar ? null : (avatarPreview || group.avatarUrl);
-    const currentBanner = removeBanner ? null : (bannerPreview || group.bannerUrl || 'https://via.placeholder.com/600x150?text=No+Banner');
+    const currentBanner = removeBanner ? null : (bannerPreview || group.bannerUrl);
 
     return (
         <Dialog open={isOpen} onClose={onClose} classes={{ paper: 'settings-modal-paper' }} maxWidth="sm" fullWidth>

@@ -28,6 +28,7 @@ const Layout = ({ user, onLogout, theme, onThemeChange }) => {
             const handleNewNotification = () => {
                 fetchNotifications();
                 
+                // Auto-expand the sidebar for 4 seconds!
                 setForceSidebarOpen(true);
                 setTimeout(() => setForceSidebarOpen(false), 4000);
             };
@@ -48,10 +49,10 @@ const Layout = ({ user, onLogout, theme, onThemeChange }) => {
     };
 
     const handleOpenNotificationsModal = async () => {
-        setHasUnseen(false);
+        setHasUnseen(false); 
         try {
             await userService.markNotificationsRead(user);
-            fetchNotifications();
+            fetchNotifications(); 
         } catch (err) { console.error("Failed to mark notifications read", err); }
     };
 
