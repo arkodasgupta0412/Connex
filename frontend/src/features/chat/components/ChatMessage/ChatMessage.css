@@ -2,6 +2,7 @@
 .message-row {
     display: flex;
     justify-content: center;
+    align-items: flex-start;
     margin-bottom: 12px;
     width: 100%;
 }
@@ -101,32 +102,60 @@
     opacity: 0.85;
 }
 
-.action-btn {
-    border: none;
-    background: transparent;
-    color: inherit;
-    cursor: pointer;
-    font-size: 11px;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    padding: 2px 6px;
-    border-radius: 4px;
-}
-
-.action-btn:hover {
-    background-color: rgba(0,0,0,0.05);
-}
-
-.action-btn.liked {
-    color: var(--danger-color);
-}
-
 /* Time */
 .message-time {
     font-size: 10px;
     opacity: 0.7;
     text-align: right;
     margin-top: 2px;
+}
+
+.message-menu-icon { 
+    position: absolute; 
+    top: 0; right: -4px; 
+    opacity: 0; 
+    transition: opacity 0.2s; 
+}
+.message-bubble:hover .message-menu-icon { opacity: 1; }
+
+.deleted-text { 
+    font-style: italic; 
+    color: var(--text-secondary);
+}
+
+.deleted-bubble { 
+    opacity: 0.7;
+    border: 1px solid var(--border-color); 
+}
+
+.edited-tag { 
+    font-size: 0.75rem; 
+    color: var(--text-secondary); 
+    margin-left: 4px; 
+}
+
+.reaction-bar { 
+    display: flex; 
+    gap: 2px; 
+}
+
+.message-actions { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    margin-top: 4px; 
+}
+
+.edit-container { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 4px; 
+}
+
+.edit-container input { 
+    width: 100%; 
+    padding: 6px; 
+    background: var(--bg-primary); 
+    border: 1px solid var(--border-color); 
+    color: var(--text-primary); border-radius: 4px; 
 }

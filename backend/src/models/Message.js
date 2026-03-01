@@ -17,9 +17,11 @@ const messageSchema = new Schema({
     content: { type: String, required: true },
     caption: { type: String, default: "" },   
 
-    likes: { type: Number, default: 0 },
-    likedBy: [{ type: String }],
+    reactions: { type: Map, of: [String], default: {} },
     comments: [commentSchema],
+    isEdited: { type: Boolean, default: false },
+    isDeleted: { type: Boolean, default: false },
+
 
     timestamp: { type: Date, default: Date.now }
 

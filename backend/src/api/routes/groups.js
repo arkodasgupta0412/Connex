@@ -1,10 +1,31 @@
 import express from 'express';
 import Group from '../../models/Group.js';
 import Message from '../../models/Message.js';
+import User from '../../models/User.js';
 
 
 export default function(io) {
     const router = express.Router();
+
+
+    const sendSystemMessage = async (groupId, content) => {
+        const sysMsg = new Message({
+            groupId: groupId,
+            sender: 'SYSTEM',
+            type: 'system',
+            content: content
+        });
+        await sysMsg.save();
+        const msgData = {
+            ...sysMsg.toObject(),
+            id: sysMsg._id.toString(),
+            groupId: sysMsg.groupId.toString()
+        };
+        if (io && typeof io.to === 'function') {
+            io.to(groupId.toString()).emit('receive_message', msgData);
+        }
+    };
+
 
     // Get all groups for a user
     router.get('/:username', async (req, res) => {
@@ -16,12 +37,19 @@ export default function(io) {
             for (let g of allGroups) {
                 g.id = g._id.toString();
 
+                const groupUsers = await User.find({ username: { $in: g.members } }).select('username avatarUrl').lean();
+                const avatarMap = {};
+                groupUsers.forEach(u => {
+                    avatarMap[u.username] = u.avatarUrl;
+                });
+
                 // Messages fetch for group g
                 const msgs = await Message.find({ groupId: g._id }).lean();
                 g.messages = msgs.map(m => ({
                     ...m,
                     id: m._id.toString(),
-                    groupId: m.groupId.toString()
+                    groupId: m.groupId.toString(),
+                    senderAvatar: avatarMap[m.sender] || ""
                 }));
 
                 if (g.members.includes(req.params.username)) {
@@ -63,20 +91,22 @@ export default function(io) {
     // CREATE a new group
     router.post('/create', async (req, res) => {
         try {
-            const { groupName, description, creator } = req.body;
+            const { name, groupName, description, creator } = req.body;
 
             const newGroup = new Group({
-                name: groupName,
+                name: groupName || name,
                 description: description || "",
+                owner: creator,
                 admins: [creator],
-                members: [creator]
+                members: [creator],
+                permissions: { membersCanEditGroupInfo: false }
             });
             
             await newGroup.save();
             res.json({ success : true, group: newGroup });
 
         } catch (error) {
-            console.error("Create Group Error:", err);
+            console.error("Create Group Error:", error);
             res.status(500).json({ success: false });
         }
     });
@@ -194,6 +224,106 @@ export default function(io) {
             res.status(500).json({ success: false });
         }
     });
+
+
+    // Update Group Info
+    router.put('/:id/info', async (req, res) => {
+        try {
+            const { description, avatarUrl, bannerUrl, username } = req.body;
+            const group = await Group.findById(req.params.id);
+            
+            let messagesToSend = [];
+
+            if (description !== undefined && description !== group.description) {
+                group.description = description;
+                messagesToSend.push(`${username} updated the group description`);
+            }
+            
+            if (avatarUrl !== undefined && avatarUrl !== group.avatarUrl) {
+                group.avatarUrl = avatarUrl;
+                messagesToSend.push(`${username} ${avatarUrl === "" ? "removed the group avatar" : "updated the group avatar"}`);
+            }
+            
+            if (bannerUrl !== undefined && bannerUrl !== group.bannerUrl) {
+                group.bannerUrl = bannerUrl;
+                messagesToSend.push(`${username} ${bannerUrl === "" ? "removed the group banner" : "updated the group banner"}`);
+            }
+
+            await group.save();
+
+            for (const msg of messagesToSend) {
+                await sendSystemMessage(group._id, msg);
+            }
+
+            res.json({ success: true });
+
+        } catch (err) {
+            console.error("Settings Update Error:", err);
+            res.status(500).json({ success: false });
+        }
+    });
+
+
+    // Update group permissions
+    router.put('/:id/permissions', async (req, res) => {
+        try {
+            const { membersCanEditInfo, adminUsername } = req.body;
+            const group = await Group.findById(req.params.id);
+            
+            group.permissions.membersCanEditGroupInfo = membersCanEditInfo;
+            await group.save();
+
+            const status = membersCanEditInfo ? "allowed" : "restricted";
+            await sendSystemMessage(group._id, `${adminUsername} ${status} members to edit group settings`);
+            res.json({ success: true });
+        } catch (err) {
+            res.status(500).json({ success: false });
+        }
+    });
+
+
+    // Set NEW nickname
+    router.put('/:id/nickname', async (req, res) => {
+        try {
+            const { username, nickname } = req.body;
+            const group = await Group.findById(req.params.id);
+            
+            group.nicknames.set(username, nickname);
+            await group.save();
+
+            await sendSystemMessage(group._id, `${username} changed their nickname to ${nickname}`);
+            res.json({ success: true });
+
+        } catch (err) {
+            res.status(500).json({ success: false });
+        }
+    });
+
+
+    // Promote / Demote member
+    router.put('/:id/role', async (req, res) => {
+        try {
+            const { targetUser, action, adminUsername } = req.body;
+            const group = await Group.findById(req.params.id);
+
+            if (action === "promote") {
+                if (!group.admins.includes(targetUser)) {
+                    group.admins.push(targetUser);
+                    await sendSystemMessage(group._id, `${adminUsername} promoted ${targetUser} to Admin`);
+                }
+            } else if (action === "demote") {
+                group.admins = group.admins.filter(u => u !== targetUser);
+                await sendSystemMessage(group._id, `${adminUsername} demoted ${targetUser} to Member`);
+            }
+
+            await group.save();
+            res.json({ success: true });
+
+        } catch (error) {
+            res.status(500).json({ success: false });
+        }
+    });
+
 
     return router;
 }

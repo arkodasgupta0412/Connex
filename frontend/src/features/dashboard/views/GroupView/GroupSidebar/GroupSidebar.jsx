@@ -5,6 +5,7 @@ import Tooltip from '@mui/material/Tooltip';
 import './GroupSidebar.css';
 
 const GroupSidebar = ({  
+    user,
     userGroups = [], 
     selectedGroup, 
     onSelectGroup,  
@@ -35,14 +36,32 @@ const GroupSidebar = ({
                         No groups yet. Click + to join or create one!
                     </p>
                 ) : (
-                    userGroups.map(g => (
-                        <GroupItem 
-                            key={g.id || g._id}
-                            group={g}
-                            isActive={selectedGroup?.id === (g.id || g._id)}
-                            onClick={() => onSelectGroup(g)}
-                        />
-                    ))
+                    userGroups.map(g => {
+
+                        // Calculate unread count
+                        const lastReadStr = g.lastRead?.[user];
+                        const lastReadDate = lastReadStr ? new Date(lastReadStr) : new Date(0);
+                        const unreadCount = (g.messages || []).filter(m => 
+                            new Date(m.timestamp) > lastReadDate && 
+                            m.sender !== user && 
+                            m.type !== 'system'
+                        ).length;
+
+                        const lastMsg = g.messages?.length > 0 ? g.messages[g.messages.length - 1] : null;
+
+                        return (
+                            <GroupItem 
+                                key={g.id || g._id}
+                                group={g}
+                                isActive={selectedGroup?.id === (g.id || g._id)}
+                                onClick={() => onSelectGroup(g)}
+                                unreadCount={unreadCount}
+                                avatarUrl={g.avatarUrl}
+                                lastMessage={lastMsg}
+                                currentUser={user}
+                            />
+                        );
+                    })
                 )}
             </div>
         </div>

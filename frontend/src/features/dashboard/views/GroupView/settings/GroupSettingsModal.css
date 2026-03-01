@@ -1,0 +1,408 @@
+/* --- GLOBAL MODAL FONT & PAPER --- */
+.settings-modal-paper {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+    border-radius: 8px !important;
+    background-image: none !important;
+    overflow: hidden !important; 
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
+}
+
+/* --- HEADER & CLOSE BUTTON --- */
+.settings-modal-header {
+    margin: 0;
+    padding: 16px 24px 8px 24px !important;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: var(--bg-secondary);
+    z-index: 10;
+    position: relative;
+}
+
+.settings-modal-title-text {
+    font-weight: 700;
+    font-size: 1.25rem;
+    letter-spacing: -0.02em;
+}
+
+.settings-modal-close-btn {
+    color: var(--text-secondary) !important;
+}
+
+.settings-modal-close-btn:hover {
+    color: var(--danger-color) !important;
+}
+
+/* --- EDITABLE BANNER --- */
+.settings-banner-container {
+    position: relative;
+    height: 140px;
+    width: 100%;
+    margin-bottom: 50px; 
+}
+
+.settings-banner {
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-color: var(--bg-tertiary); 
+    transition: filter 0.2s ease;
+}
+
+.banner-overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.settings-banner-container:hover .banner-overlay {
+    opacity: 1;
+}
+
+/* --- EDITABLE AVATAR --- */
+.settings-avatar-wrapper {
+    position: absolute;
+    bottom: -40px;
+    left: 24px;
+    width: 88px;
+    height: 88px;
+    border-radius: 50%;
+    border: 6px solid var(--bg-secondary);
+    background-color: var(--bg-tertiary);
+    z-index: 2;
+}
+
+.settings-avatar {
+    width: 100% !important;
+    height: 100% !important;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+
+.avatar-overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    cursor: pointer;
+}
+
+.settings-avatar-wrapper:hover .avatar-overlay {
+    opacity: 1;
+}
+
+.edit-icon-btn {
+    color: white !important;
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    padding: 6px !important;
+}
+
+.edit-icon-btn:hover {
+    background-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+.delete-icon-btn {
+    color: #ff4d4d !important;
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    padding: 6px !important;
+}
+
+.delete-icon-btn:hover {
+    background-color: rgba(255, 77, 77, 0.2) !important;
+}
+
+/* --- TABS --- */
+.settings-modal-tabs-container {
+    border-bottom: 1px solid var(--border-color);
+    padding: 0 16px;
+}
+
+.settings-modal-tab {
+    color: var(--text-secondary) !important;
+    font-weight: 600 !important;
+    font-family: inherit !important;
+}
+
+.settings-modal-tab.Mui-selected {
+    color: #5865F2 !important;
+}
+
+.settings-modal-tabs-container .MuiTabs-indicator {
+    background-color: #5865F2;
+}
+
+/* --- TAB CONTENT AREAS --- */
+.settings-tab-panel-box {
+    padding-top: 24px;
+    padding-bottom: 8px;
+}
+
+.settings-modal-content {
+    padding: 0 24px 24px 24px !important;
+    min-height: 250px;
+}
+
+/* --- OVERVIEW TAB --- */
+.overview-header {
+    margin-bottom: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.overview-group-name {
+    font-weight: 800 !important;
+    color: var(--text-primary) !important;
+    letter-spacing: -0.02em;
+}
+
+.overview-group-code-chip {
+    background-color: var(--bg-tertiary) !important;
+    color: var(--text-secondary) !important;
+    font-weight: 600 !important;
+    font-family: inherit !important;
+}
+
+.overview-section {
+    margin-bottom: 20px;
+}
+
+.overview-section-label {
+    color: var(--text-secondary) !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.5px !important;
+    display: block;
+    margin-bottom: 8px !important;
+}
+
+.overview-section-body {
+    color: var(--text-primary) !important;
+    font-size: 0.95rem !important;
+    line-height: 1.5 !important;
+}
+
+.permissions-section {
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px;
+    background-color: var(--bg-tertiary);
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+}
+
+.permissions-text-block {
+    display: flex;
+    flex-direction: column;
+}
+
+.permissions-label {
+    color: var(--text-primary);
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.permissions-subtext {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
+/* Editable Description Input */
+.description-input .MuiOutlinedInput-root {
+    color: var(--text-primary);
+    background-color: var(--bg-tertiary);
+    font-family: inherit;
+    font-size: 0.95rem;
+}
+
+.description-input .MuiOutlinedInput-root fieldset {
+    border-color: var(--border-color);
+}
+
+.description-input .MuiOutlinedInput-root:hover fieldset {
+    border-color: var(--text-secondary);
+}
+
+.description-input .MuiOutlinedInput-root.Mui-focused fieldset {
+    border-color: #5865F2;
+}
+
+/* --- SAVE & LEAVE ACTIONS --- */
+.overview-actions-container {
+    margin-top: 32px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.save-changes-btn {
+    background-color: #23a559 !important;
+    color: white !important;
+    font-weight: bold !important;
+    font-family: inherit !important;
+}
+
+.save-changes-btn:hover {
+    background-color: #1a7c43 !important;
+}
+
+.leave-group-btn {
+    font-weight: bold !important;
+    font-family: inherit !important;
+}
+
+/* --- MEMBERS TAB --- */
+.members-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.member-list-item {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    border-bottom: 1px solid var(--border-color) !important;
+}
+
+.member-avatar {
+    background-color: #5865F2 !important;
+    font-family: inherit !important;
+    font-weight: bold !important;
+}
+
+.member-name-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.member-name-text {
+    color: var(--text-primary) !important;
+    font-family: inherit !important;
+}
+
+.member-name-text.current-user {
+    font-weight: 700 !important;
+}
+
+.member-role-text {
+    color: var(--text-secondary) !important;
+    font-size: 0.85rem !important;
+}
+
+.member-role-text.admin-role {
+    color: #23a559 !important;
+    font-weight: 600;
+}
+
+.member-role-text.owner-role {
+    color: #F1C40F !important;
+    font-weight: 700;
+}
+
+.role-icon {
+    margin-right: 8px;
+}
+
+.owner-icon {
+    color: #F1C40F !important;
+}
+
+.admin-icon {
+    color: #23a559 !important;
+}
+
+.more-vert-icon {
+    color: var(--text-secondary) !important;
+}
+
+.edit-nick-btn {
+    color: var(--text-secondary) !important;
+    padding: 4px !important;
+}
+
+.edit-nick-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.nickname-edit-container {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    margin-right: 10px;
+}
+
+.nickname-input-field {
+    flex: 1;
+}
+
+.save-nick-btn {
+    margin-left: 4px !important;
+}
+
+/* --- ROLE MENU --- */
+.role-menu-paper {
+    background-color: var(--bg-tertiary) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border-color);
+}
+
+.menu-item-promote {
+    color: #23a559 !important;
+}
+
+.menu-item-demote {
+    color: #f23f43 !important;
+}
+
+/* --- REQUESTS TAB --- */
+.requests-empty-text {
+    color: var(--text-secondary) !important;
+    text-align: center !important;
+    margin-top: 16px !important;
+}
+
+/* --- REQUESTS TAB --- */
+.requests-empty-text {
+    color: var(--text-secondary) !important;
+    text-align: center !important;
+    margin-top: 16px !important;
+}
+
+.request-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.accept-req-btn {
+    color: #23a559 !important;
+    background-color: rgba(35, 165, 89, 0.1) !important;
+}
+
+.accept-req-btn:hover {
+    background-color: rgba(35, 165, 89, 0.2) !important;
+}
+
+.reject-req-btn {
+    color: #f23f43 !important;
+    background-color: rgba(242, 63, 67, 0.1) !important;
+}
+
+.reject-req-btn:hover {
+    background-color: rgba(242, 63, 67, 0.2) !important;
+}

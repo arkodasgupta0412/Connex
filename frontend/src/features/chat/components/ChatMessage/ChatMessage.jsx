@@ -1,5 +1,11 @@
-import { useState } from 'react';
+import { Avatar, IconButton, Menu, MenuItem, Tooltip } from '@mui/material';
+import { 
+    ThumbUp, ThumbUpOutlined, Favorite, FavoriteBorder, 
+    EmojiEmotions, EmojiEmotionsOutlined, MoreVert, ChatBubbleOutline,
+    Block as BlockIcon
+} from '@mui/icons-material';
 
+import { useState } from 'react';
 import CommentModal from '../CommentModal/CommentModal';
 import './ChatMessage.css'; 
 
@@ -12,30 +18,49 @@ const getSenderColorIndex = (username) => {
     return (Math.abs(hash) % 6) + 1; // 1–6
 };
 
-const ChatMessage = ({ msg, user, onComment, theme, socket, groupId }) => {
+const ChatMessage = ({ msg, user, group, onComment, theme, socket, groupId, onEditStart }) => {
     const senderName = (msg.sender || '').trim();
     const currentUser = (user || '').trim();
     const isMe = senderName.toLowerCase() === currentUser.toLowerCase();
-    const [showComments, setShowComments] = useState(false);
-    
-    const likes = msg.likes || 0;
-    const userLiked = msg.likedBy && msg.likedBy.includes(user);
+    const senderNickname = group?.nicknames?.[senderName] || senderName;
 
-    const handleLike = () => {
-        if (socket && groupId) {
-            socket.emit("add_like", {
-                groupId,
-                messageId: msg.id,
-                username: user
-            });
-        }
+    const [showComments, setShowComments] = useState(false);
+    const [anchorEl, setAnchorEl] = useState(null);
+    const [isEditing, setIsEditing] = useState(false);
+    const [editContent, setEditContent] = useState(msg.content);
+
+
+    let displayContent = msg.content;
+    if (msg.type === 'system' && group?.nicknames) {
+        Object.keys(group.nicknames).forEach(uname => {
+            const regex = new RegExp(`\\b${uname}\\b`, 'g');
+            displayContent = displayContent.replace(regex, group.nicknames[uname]);
+        });
+    }
+
+    const handleReaction = (type) => {
+        socket.emit("toggle_reaction", { groupId, messageId: msg.id, username: currentUser, reactionType: type });
     };
+
+    const handleEditSubmit = () => {
+        socket.emit("edit_message", { groupId, messageId: msg.id, newContent: editContent });
+        setIsEditing(false);
+    };
+
+    const handleDelete = () => {
+        socket.emit("delete_message", { groupId, messageId: msg.id });
+        setAnchorEl(null);
+    };
+
+    const reactions = msg.reactions || {};
+    const hasReacted = (type) => (reactions[type] || []).includes(currentUser);
+
 
     if (msg.type === 'system') {
         return (
             <div className="message-row system">
                 <div className="system-message">
-                    {msg.content}
+                    {displayContent}
                 </div>
             </div>
         );
@@ -45,57 +70,89 @@ const ChatMessage = ({ msg, user, onComment, theme, socket, groupId }) => {
 
     return (
         <div className={`message-row ${isMe ? 'sent' : 'received'}`}>
-            <div className="message-bubble">
+
+            {!isMe && (
+                <Avatar sx={{ width: 32, height: 32, mr: 1, bgcolor: '#5865F2' }}>
+                    {senderNickname.charAt(0).toUpperCase()}
+                </Avatar>
+            )}
+
+            <div className={`message-bubble ${msg.isDeleted ? 'deleted-bubble' : ''}`}>
                 
                 {/* SENDER NAME */}
                 <div className={`sender-name ${senderColorClass}`}>
-                    {isMe ? 'You' : msg.sender}
+                    {isMe ? 'You' : senderNickname}
                 </div>
 
+                {isMe && !msg.isDeleted && (
+                    <div className="message-menu-icon">
+                        <IconButton size="small" onClick={(e) => setAnchorEl(e.currentTarget)}>
+                            <MoreVert fontSize="inherit" />
+                        </IconButton>
+                        <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={() => setAnchorEl(null)}>
+                            {msg.type !== 'system' && (
+                                <MenuItem onClick={() => { onEditStart(msg); setAnchorEl(null); }}>Edit</MenuItem>
+                            )}
+                            <MenuItem onClick={handleDelete} sx={{ color: '#f23f43' }}>Delete</MenuItem>
+                        </Menu>
+                    </div>
+                )}
+
+
                 {/* CONTENT */}
-                {msg.type === 'text' ? (
-                    <div className="message-text">{msg.content}</div>
+                {msg.isDeleted ? (
+                    <div className="message-text deleted-text">
+                        <BlockIcon fontSize="inherit" sx={{ mr: 0.5, verticalAlign: 'middle' }} />
+                        This message was deleted
+                    </div>
+                ) : msg.type === 'text' ? (
+                    <div className="message-text">
+                        {msg.content} {msg.isEdited && <span className="edited-tag">(edited)</span>}
+                    </div>
                 ) : (
                     <div className="message-media">
-                        <img 
-                            src={msg.content} 
-                            alt="shared" 
-                            className="message-image"
-                            onClick={() => setShowComments(true)}
-                        />
-                        
-                        {msg.caption && (
+                        <img src={msg.content} alt="shared" className="message-image" onClick={() => setShowComments(true)}/>
+                        {(msg.caption || msg.isEdited) && (
                             <div className="image-caption">
-                                {msg.caption}
+                                {msg.caption} {msg.isEdited && <span className="edited-tag">(edited)</span>}
                             </div>
                         )}
                     </div>
                 )}
 
-                {/* LIKE & COMMENT BUTTONS */}
-                <div className="message-actions">
-                    <button
-                        className={`action-btn ${userLiked ? 'liked' : ''}`}
-                        onClick={handleLike}
-                    >
-                        Like {likes > 0 && `(${likes})`}
-                    </button>
 
-                    {msg.type === 'photo' && (
-                        <button
-                            className="action-btn"
-                            onClick={() => setShowComments(true)}
-                        >
-                            Comment {(msg.comments || []).length > 0 && `(${(msg.comments || []).length})`}
-                        </button>
-                    )}
-                </div>
+                {/* LIKE & COMMENT BUTTONS */}
+                {!msg.isDeleted && (
+                    <div className="message-actions">
+                        <div className="reaction-bar">
+                            <Tooltip title="Like"><IconButton size="small" onClick={() => handleReaction('like')} color={hasReacted('like') ? "primary" : "default"}>{hasReacted('like') ? <ThumbUp fontSize="small" /> : <ThumbUpOutlined fontSize="small" />}</IconButton></Tooltip>
+                            <Tooltip title="Love"><IconButton size="small" onClick={() => handleReaction('love')} color={hasReacted('love') ? "error" : "default"}>{hasReacted('love') ? <Favorite fontSize="small" /> : <FavoriteBorder fontSize="small" />}</IconButton></Tooltip>
+                            <Tooltip title="Haha"><IconButton size="small" onClick={() => handleReaction('haha')} color={hasReacted('haha') ? "warning" : "default"}>{hasReacted('haha') ? <EmojiEmotions fontSize="small" /> : <EmojiEmotionsOutlined fontSize="small" />}</IconButton></Tooltip>
+                        </div>
+                        
+                        {msg.type === 'photo' && (
+                            <IconButton size="small" onClick={() => setShowComments(true)} className="comment-btn">
+                                <ChatBubbleOutline fontSize="small" sx={{ mr: 0.5 }} /> {(msg.comments || []).length}
+                            </IconButton>
+                        )}
+                    </div>
+                )}
+
                 
                 {/* TIMESTAMP */}
                 <div className="message-time">
                     {new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
                 </div>
             </div>
+
+            
+            {/* User's own avatar on the right */}
+            {isMe && (
+                <Avatar sx={{ width: 32, height: 32, ml: 1, bgcolor: '#23a559' }}>
+                    {senderNickname.charAt(0).toUpperCase()}
+                </Avatar>
+            )}
+
 
             {/* COMMENT MODAL */}
             {msg.type === 'photo' && showComments && (

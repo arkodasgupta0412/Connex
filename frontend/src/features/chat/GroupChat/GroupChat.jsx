@@ -1,6 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import io from 'socket.io-client';
-import { v4 as uuidv4 } from 'uuid';
+
+import SettingsIcon from '@mui/icons-material/Settings';
+import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
+import { Chip } from '@mui/material';
 
 import ChatHeader from '../components/ChatHeader/ChatHeader';
 import ChatInput from '../components/ChatInput/ChatInput';
@@ -22,14 +26,17 @@ socket.on("connect", () => {});
 socket.on("connect_error", () => {});
 socket.on("disconnect", () => {});
 
-const GroupChat = ({ user, group, onBack, theme }) => {
+const GroupChat = ({ user, group, onBack, theme, onOpenSettings, onChatUpdate }) => {
     const [messages, setMessages] = useState([]); 
     const [inputText, setInputText] = useState("");
     const [captionText, setCaptionText] = useState("");
     const [showCaptionModal, setShowCaptionModal] = useState(false);
     const [uploadedImageUrl, setUploadedImageUrl] = useState(null);
+    const [editingMessage, setEditingMessage] = useState(null);
+    const [typingUsers, setTypingUsers] = useState(new Set());
     const messagesEndRef = useRef(null);
 
+    let typingTimeout = useRef(null);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -41,7 +48,7 @@ const GroupChat = ({ user, group, onBack, theme }) => {
 
     useEffect(() => {
         socket.emit("join_group", group.id);
-
+        socket.emit("mark_read", { groupId: group.id, username: user });
 
         const fetchHistory = async () => {
             try {
@@ -61,6 +68,8 @@ const GroupChat = ({ user, group, onBack, theme }) => {
                 if (prev.some(m => m.id === data.id)) return prev; 
                 return [...prev, data];
             });
+            socket.emit("mark_read", { groupId: group.id, username: user });
+            if (onChatUpdate) onChatUpdate();
         };
 
 
@@ -86,34 +95,112 @@ const GroupChat = ({ user, group, onBack, theme }) => {
 
 
         socket.on("receive_message", handleReceiveMsg);
-        socket.on("update_comments", handleUpdateComments);
-        socket.on("update_likes", handleUpdateLikes);
+        
+        socket.on("display_typing", ({ username, isTyping }) => {
+            setTypingUsers(prev => {
+                const newSet = new Set(prev);
+                isTyping ? newSet.add(username) : newSet.delete(username);
+                return newSet;
+            });
+        });
+
+        socket.on("message_edited", ({ messageId, newContent, newCaption }) => {
+            setMessages(prev => prev.map(m => m.id === messageId ? { 
+                ...m, 
+                content: newContent !== undefined ? newContent : m.content,
+                caption: newCaption !== undefined ? newCaption : m.caption,
+                isEdited: true 
+            } : m));
+            if (onChatUpdate) onChatUpdate();
+        });
+
+        socket.on("message_deleted", ({ messageId }) => {
+            setMessages(prev => prev.map(m => m.id === messageId ? { 
+                ...m, isDeleted: true, 
+                content: "This message was deleted." 
+            } : m));
+            if (onChatUpdate) onChatUpdate();
+        });
+
+        socket.on("update_reactions", ({ messageId, reactions }) => {
+            setMessages(prev => prev.map(m => m.id === messageId ? { 
+                ...m, reactions 
+            } : m));
+        });
+
+        socket.on("update_comments", ({ messageId, comment }) => {
+            setMessages(prev => prev.map(m => m.id === messageId ? { 
+                ...m, comments: [...(m.comments || []), comment] 
+            } : m));
+        });
+
 
         return () => {
             socket.off("receive_message", handleReceiveMsg);
-            socket.off("update_comments", handleUpdateComments);
-            socket.off("update_likes", handleUpdateLikes);
+            socket.off("display_typing");
+            socket.off("message_edited");
+            socket.off("message_deleted");
+            socket.off("update_reactions");
+            socket.off("update_comments");
         };
     }, [group.id, user]);
 
+
+    const handleTyping = (e) => {
+        setInputText(e.target.value);
+        socket.emit("typing", { groupId: group.id, username: user, isTyping: true });
+        
+        clearTimeout(typingTimeout.current);
+        typingTimeout.current = setTimeout(() => {
+            socket.emit("typing", { groupId: group.id, username: user, isTyping: false });
+        }, 2000);
+    };
+
+
+    const isNewDay = (prevDate, currDate) => {
+        if (!prevDate) return true;
+        return new Date(prevDate).toDateString() !== new Date(currDate).toDateString();
+    };
+
+
     const sendMessage = async () => {
+        if (editingMessage) {
+            // Prevent sending an empty text message, but allow emptying an image caption
+            if (editingMessage.type === 'text' && !inputText.trim()) return;
+
+            const editPayload = { 
+                groupId: group.id, 
+                messageId: editingMessage.id 
+            };
+
+            if (editingMessage.type === 'photo') {
+                editPayload.newCaption = inputText.trim();
+            } else {
+                editPayload.newContent = inputText.trim();
+            }
+
+            socket.emit("edit_message", editPayload);
+            setEditingMessage(null);
+            setInputText("");
+            return;
+        }
+
         if (!inputText.trim()) return;
 
+        // NORMAL SEND
         const msgData = { 
-            id: uuidv4(),
             groupId: group.id, 
             sender: user, 
             type: 'text', 
             content: inputText,
             timestamp: new Date().toISOString(),
             comments: [],
-            likes: 0,
-            likedBy: []
+            reactions: {}
         };
 
-        setMessages((prev) => [...prev, msgData]);
-        setInputText("");
         socket.emit("send_message", msgData);
+        setInputText("");
+        if (onChatUpdate) onChatUpdate();
     };
 
 
@@ -138,7 +225,6 @@ const GroupChat = ({ user, group, onBack, theme }) => {
         if (!uploadedImageUrl) return;
 
         const msgData = { 
-            id: uuidv4(),
             groupId: group.id, 
             sender: user, 
             type: 'photo', 
@@ -150,12 +236,12 @@ const GroupChat = ({ user, group, onBack, theme }) => {
             likedBy: []
         };
         
-        setMessages((prev) => [...prev, msgData]);
         socket.emit("send_message", msgData);
         
         setShowCaptionModal(false);
         setUploadedImageUrl(null);
         setCaptionText("");
+        if (onChatUpdate) onChatUpdate();
     };
 
 
@@ -174,36 +260,97 @@ const GroupChat = ({ user, group, onBack, theme }) => {
     return (
         <div className={`group-chat-container ${themeClass}`}>
             
-            {/* 1. MODULAR HEADER */}
-            <ChatHeader 
-                groupName={group.name} 
-                onBack={onBack} 
-            />
+            {/* MODULAR HEADER */}
+            <div style={{ position: 'relative' }}>
+                <ChatHeader 
+                    groupName={group.name} 
+                    onBack={onBack} 
+                />
+                
+                {/* THE SETTINGS GEAR ICON */}
+                <IconButton 
+                    onClick={onOpenSettings}
+                    title="Group Settings"
+                    style={{ 
+                        position: 'absolute', 
+                        right: '16px', 
+                        top: '50%', 
+                        transform: 'translateY(-50%)', 
+                        color: 'var(--text-secondary)' 
+                    }}
+                >
+                    <SettingsIcon />
+                </IconButton>
+            </div>
+
 
             <div className="chat-area">
                 {messages.length === 0 && <div className="empty-chat-message">No messages yet.</div>}
                 
-                {messages.map((msg) => (
-                    <ChatMessage 
-                        key={msg.id} 
-                        msg={msg} 
-                        user={user} 
-                        onComment={sendComment} 
-                        theme={theme}
-                        socket={socket}
-                        groupId={group.id}
-                    />
-                ))}
+                {messages.map((msg, index) => {
+                    const showDate = isNewDay(index === 0 ? null : messages[index - 1].timestamp, msg.timestamp);
+                    return (
+                        <div key={msg.id}>
+                            {showDate && (
+                                <div style={{ textAlign: 'center', margin: '20px 0' }}>
+                                    <Chip 
+                                        label={new Date(msg.timestamp).toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })} 
+                                        size="small" 
+                                        sx={{ bgcolor: 'var(--bg-tertiary)', color: 'var(--text-secondary)' }} 
+                                    />
+                                </div>
+                            )}
+                            <ChatMessage 
+                                msg={msg} 
+                                user={user} 
+                                group={group} 
+                                onComment={sendComment} 
+                                theme={theme} 
+                                socket={socket} 
+                                groupId={group.id} 
+                                onEditStart={(targetMsg) => { 
+                                    setEditingMessage(targetMsg); 
+                                    setInputText(targetMsg.type === 'photo' ? (targetMsg.caption || "") : targetMsg.content);
+                                }}
+                            />
+                        </div>
+                    );
+                })}
+                
+                {typingUsers.size > 0 && (
+                    <div style={{ fontStyle: 'italic', color: 'var(--text-secondary)', fontSize: '12px', marginLeft: '16px' }}>
+                        {Array.from(typingUsers).map(u => group?.nicknames?.[u] || u).join(", ")} {typingUsers.size === 1 ? 'is' : 'are'} typing...
+                    </div>
+                )}
                 <div ref={messagesEndRef} />
             </div>
 
-            {/* 2. MODULAR INPUT */}
+
+            {editingMessage && (
+                <div className="edit-banner">
+                    <div className="edit-banner-info">
+                        <span className="edit-banner-title">
+                            {editingMessage.type === 'photo' ? 'Editing Caption' : 'Editing Message'}
+                        </span>
+                        <span className="edit-banner-text">
+                            {editingMessage.type === 'photo' ? (editingMessage.caption || "No caption") : editingMessage.content}
+                        </span>
+                    </div>
+                    <IconButton size="small" onClick={() => { setEditingMessage(null); setInputText(""); }}>
+                        <CloseIcon fontSize="small" />
+                    </IconButton>
+                </div>
+            )}
+
+
+            {/* MODULAR INPUT */}
             <ChatInput 
                 value={inputText}
-                onChange={(e) => setInputText(e.target.value)}
+                onChange={handleTyping}
                 onSend={sendMessage}
                 onAttach={handleFileUpload}
             />
+
 
             {/* CAPTION MODAL */}
             {showCaptionModal && (

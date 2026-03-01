@@ -32,10 +32,6 @@ connectDB();
 
 setupMiddleware(app);
 
-if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR);
-if (!fs.existsSync(DB_USERS)) fs.writeFileSync(DB_USERS, "[]");
-if (!fs.existsSync(DB_GROUPS)) fs.writeFileSync(DB_GROUPS, "[]");
-
 app.use("/", authRoutes);
 app.use("/groups", groupRoutes(io));
 app.use("/upload", uploadRoutes);

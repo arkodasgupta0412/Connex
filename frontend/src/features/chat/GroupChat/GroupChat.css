@@ -139,3 +139,37 @@
 .btn-caption-send:hover {
     background-color: var(--primary-hover);
 }
+
+/* --- EDIT BANNER --- */
+.edit-banner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 16px;
+    background-color: var(--bg-tertiary);
+    border-top: 1px solid var(--border-color);
+    border-left: 4px solid #5865F2;
+}
+
+.edit-banner-info {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    flex: 1;
+    margin-right: 12px;
+}
+
+.edit-banner-title {
+    font-size: 11px;
+    font-weight: bold;
+    color: #5865F2;
+    margin-bottom: 2px;
+}
+
+.edit-banner-text {
+    font-size: 13px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

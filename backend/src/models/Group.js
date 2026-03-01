@@ -26,6 +26,13 @@ const groupSchema = new Schema({
     avatarUrl: { type: String, default: "" },
     bannerUrl: { type: String, default: "" },
 
+    owner: [{ type: String, required: true }],
+    nicknames: { type: Map, of: String, default: {} },
+    lastRead: { type: Map, of: Date, default: {} },
+    permissions: {
+        membersCanEditGroupInfo: { type: Boolean, default: false }
+    },
+
     admins: [{ type: String }],
     members: [{ type: String }],
     joinRequests: [{ type: String }]
