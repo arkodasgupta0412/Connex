@@ -4,7 +4,7 @@ import io from 'socket.io-client';
 import SettingsIcon from '@mui/icons-material/Settings';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
-import { Chip } from '@mui/material';
+import { Chip, Badge } from '@mui/material';
 
 import ChatHeader from '../components/ChatHeader/ChatHeader';
 import ChatInput from '../components/ChatInput/ChatInput';
@@ -15,7 +15,7 @@ import { API_URL } from  '../../../config/index';
 import './GroupChat.css'; 
 
 
-const socket = io.connect(API_URL, {
+export const socket = io.connect(API_URL, {
     reconnection: true,
     reconnectionDelay: 1000,
     reconnectionDelayMax: 5000,
@@ -262,24 +262,21 @@ const GroupChat = ({ user, group, onBack, theme, onOpenSettings, onChatUpdate })
             
             {/* MODULAR HEADER */}
             <div style={{ position: 'relative' }}>
-                <ChatHeader 
-                    groupName={group.name} 
-                    onBack={onBack} 
-                />
+                <ChatHeader groupName={group.name} onBack={onBack} />
                 
                 {/* THE SETTINGS GEAR ICON */}
                 <IconButton 
                     onClick={onOpenSettings}
                     title="Group Settings"
-                    style={{ 
-                        position: 'absolute', 
-                        right: '16px', 
-                        top: '50%', 
-                        transform: 'translateY(-50%)', 
-                        color: 'var(--text-secondary)' 
-                    }}
+                    style={{ position: 'absolute', right: '16px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-secondary)' }}
                 >
-                    <SettingsIcon />
+                    <Badge 
+                        color="error" 
+                        variant="dot" 
+                        invisible={!(group.admins?.includes(user) && group.joinRequests?.length > 0)}
+                    >
+                        <SettingsIcon />
+                    </Badge>
                 </IconButton>
             </div>
 

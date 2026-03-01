@@ -3,7 +3,7 @@ import {
     Dialog, DialogTitle, DialogContent, Tabs, Tab, 
     Avatar, Typography, Button, IconButton, 
     List, ListItem, ListItemAvatar, ListItemText, Chip, TextField,
-    Switch, Menu, MenuItem 
+    Switch, Menu, MenuItem, Badge 
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import LogoutIcon from '@mui/icons-material/Logout';
@@ -225,17 +225,34 @@ const GroupSettingsModal = ({ isOpen, onClose, group, currentUser, onLeaveGroup,
             </div>
 
             <div className="settings-modal-tabs-container">
+
                 <Tabs value={tabIndex} onChange={(e, val) => setTabIndex(val)} variant="fullWidth">
                     <Tab label="Overview" className="settings-modal-tab" />
                     <Tab label={`Members (${group.members?.length || 0})`} className="settings-modal-tab" />
-                    {isAdmin && <Tab label={`Requests (${group.joinRequests?.length || 0})`} className="settings-modal-tab" />}
+                    
+                    {/* WRAP LABEL IN BADGE FOR RED DOT */}
+                    {isAdmin && (
+                        <Tab 
+                            label={
+                                <Badge 
+                                    color="error" 
+                                    variant="dot" 
+                                    invisible={!group.joinRequests || group.joinRequests.length === 0}
+                                    sx={{ '& .MuiBadge-badge': { right: -10, top: 5 } }}
+                                >
+                                    Requests ({group.joinRequests?.length || 0})
+                                </Badge>
+                            } 
+                            className="settings-modal-tab" 
+                        />
+                    )}
                 </Tabs>
             </div>
 
             <DialogContent className="settings-modal-content">
                 
                 <CustomTabPanel value={tabIndex} index={0}>
-                    {/* ... (Keep your existing Overview tab code here) ... */}
+                 
                     <div className="overview-header">
                         <div>
                             <Typography variant="h5" className="overview-group-name">{group.name}</Typography>
@@ -287,7 +304,7 @@ const GroupSettingsModal = ({ isOpen, onClose, group, currentUser, onLeaveGroup,
                 </CustomTabPanel>
 
                 <CustomTabPanel value={tabIndex} index={1}>
-                    {/* ... (Keep your existing Members tab code here) ... */}
+                    
                     <List className="members-list">
                         {group.members?.map((member) => {
                             const isUserOwner = (Array.isArray(group.owner) ? group.owner.includes(member) : group.owner === member) || group.admins?.[0] === member;
@@ -348,7 +365,7 @@ const GroupSettingsModal = ({ isOpen, onClose, group, currentUser, onLeaveGroup,
                     </List>
                 </CustomTabPanel>
 
-                {/* --- TAB 2: REQUESTS (UPDATED) --- */}
+                {/* --- TAB 2: REQUESTS  --- */}
                 {isAdmin && (
                     <CustomTabPanel value={tabIndex} index={2}>
                         {(!group.joinRequests || group.joinRequests.length === 0) ? (

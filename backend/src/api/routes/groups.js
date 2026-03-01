@@ -194,7 +194,17 @@ export default function(io) {
                 };
 
                 if (io && typeof io.to === 'function') {
-                    io.to(groupId).emit('receive_message', msgData);
+                    io.to(groupId).emit('receive_message', msgData); 
+
+                    io.to(username).emit('added_to_group');          
+                    io.to(username).emit('new_notification', { 
+                        type: 'success', 
+                        text: `Your request to join ${group.name} was accepted!` 
+                    });
+                    
+                    group.admins.forEach(admin => {
+                        io.to(admin).emit('group_updated');
+                    });
                 }
                 res.json({ success: true, message: 'User accepted' });
 
@@ -214,15 +224,60 @@ export default function(io) {
         try {
             const { groupId, username } = req.body;
 
-            await Group.findByIdAndUpdate(groupId, {
+            const group = await Group.findByIdAndUpdate(groupId, {
                 $pull: { joinRequests: username }
             });
+
+            if (group && io && typeof io.to === 'function') {
+                io.to(username).emit('new_notification', { 
+                    type: 'error', 
+                    text: `Your request to join ${group.name} was declined.` 
+                });
+                
+                group.admins.forEach(admin => {
+                    io.to(admin).emit('group_updated');
+                });
+            }
+
             res.json({ success: true, message: 'User rejected' });
 
         } catch (err) {
             console.error("Reject Request Error:", err);
             res.status(500).json({ success: false });
         }
+    });
+
+
+    // Group Leave endpoint
+    router.post('/leave', async (req, res) => {
+        try {
+            const { groupId, username } = req.body;
+            const group = await Group.findById(groupId);
+            if (!group) return res.status(404).json({ error: "Group not found" });
+
+            // Remove from members and admins
+            group.members = group.members.filter(m => m !== username);
+            group.admins = group.admins.filter(m => m !== username);
+            
+            // If owner leaves, reassign owner or delete group
+            group.owner = group.owner.filter(m => m !== username);
+            
+            await group.save();
+
+            // Tell the group chat that the user left
+            const leaveMsg = new Message({
+                groupId: group._id, sender: 'System', type: 'system',
+                content: `${username} left the group`
+            });
+            await leaveMsg.save();
+
+            if (io) {
+                io.to(groupId).emit('receive_message', { ...leaveMsg.toObject(), id: leaveMsg._id.toString() });
+                io.to(username).emit('group_updated');
+            }
+
+            res.json({ success: true, message: "Left group successfully" });
+        } catch (err) { res.status(500).json({ error: err.message }); }
     });
 
 
@@ -324,6 +379,6 @@ export default function(io) {
         }
     });
 
-
+    
     return router;
 }

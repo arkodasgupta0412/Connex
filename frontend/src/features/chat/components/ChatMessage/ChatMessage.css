@@ -159,3 +159,16 @@
     border: 1px solid var(--border-color); 
     color: var(--text-primary); border-radius: 4px; 
 }
+
+.mention-highlight {
+    color: var(--primary-color);
+    background-color: var(--primary-subtle);
+    font-weight: 600;
+    padding: 1px 4px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.mention-highlight:hover {
+    text-decoration: underline;
+}

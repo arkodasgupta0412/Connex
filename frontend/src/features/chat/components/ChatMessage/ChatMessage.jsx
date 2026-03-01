@@ -1,7 +1,8 @@
 import { Avatar, IconButton, Menu, MenuItem, Tooltip } from '@mui/material';
 import { 
     ThumbUp, ThumbUpOutlined, Favorite, FavoriteBorder, 
-    EmojiEmotions, EmojiEmotionsOutlined, MoreVert, ChatBubbleOutline,
+    EmojiEmotions, EmojiEmotionsOutlined, MoreVert, ModeCommentOutlined,
+    SentimentDissatisfied, SentimentDissatisfiedOutlined,
     Block as BlockIcon
 } from '@mui/icons-material';
 
@@ -17,6 +18,21 @@ const getSenderColorIndex = (username) => {
     }
     return (Math.abs(hash) % 6) + 1; // 1–6
 };
+
+
+const renderMessageText = (text) => {
+    if (!text) return null;
+
+    // Split text by @mentions
+    const parts = text.split(/(@\w+)/g);
+    return parts.map((part, i) => {
+        if (part.match(/(@\w+)/)) {
+            return <span key={i} className="mention-highlight">{part}</span>;
+        }
+        return part;
+    });
+};
+
 
 const ChatMessage = ({ msg, user, group, onComment, theme, socket, groupId, onEditStart }) => {
     const senderName = (msg.sender || '').trim();
@@ -107,14 +123,16 @@ const ChatMessage = ({ msg, user, group, onComment, theme, socket, groupId, onEd
                     </div>
                 ) : msg.type === 'text' ? (
                     <div className="message-text">
-                        {msg.content} {msg.isEdited && <span className="edited-tag">(edited)</span>}
+                        {/* Use the new parser here! */}
+                        {renderMessageText(msg.content)} 
+                        {msg.isEdited && <span className="edited-tag">(edited)</span>}
                     </div>
                 ) : (
                     <div className="message-media">
                         <img src={msg.content} alt="shared" className="message-image" onClick={() => setShowComments(true)}/>
                         {(msg.caption || msg.isEdited) && (
                             <div className="image-caption">
-                                {msg.caption} {msg.isEdited && <span className="edited-tag">(edited)</span>}
+                                {renderMessageText(msg.caption)} {msg.isEdited && <span className="edited-tag">(edited)</span>}
                             </div>
                         )}
                     </div>
@@ -131,8 +149,8 @@ const ChatMessage = ({ msg, user, group, onComment, theme, socket, groupId, onEd
                         </div>
                         
                         {msg.type === 'photo' && (
-                            <IconButton size="small" onClick={() => setShowComments(true)} className="comment-btn">
-                                <ChatBubbleOutline fontSize="small" sx={{ mr: 0.5 }} /> {(msg.comments || []).length}
+                            <IconButton size="small" onClick={() => setShowComments(true)} sx={{ color: 'var(--text-secondary)' }}>
+                                <ModeCommentOutlined fontSize="small" /> 
                             </IconButton>
                         )}
                     </div>

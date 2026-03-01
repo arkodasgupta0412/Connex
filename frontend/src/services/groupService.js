@@ -1,6 +1,7 @@
 import api from './api'
 
 const groupService = {
+
     fetchAllGroups: async (username) => {
         const response = await api.get(`/groups/${username}`);
         return response.data;
@@ -51,6 +52,15 @@ const groupService = {
             username: username
         };
         const response = await api.post('/groups/request/reject', payload);
+        return response.data;
+    },
+
+
+    leaveGroup: async (groupId, username) => {
+        const response = await api.post('/groups/leave', { 
+            groupId, 
+            username 
+        });
         return response.data;
     },
 

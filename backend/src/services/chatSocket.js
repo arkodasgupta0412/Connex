@@ -10,6 +10,12 @@ export default (io) => {
             socket.join(groupId);
         });
 
+        socket.on("setup_user", (username) => {
+            if (username) {
+                socket.join(username);
+            }
+        });
+        
 
         // TYPING INDICATORS
         socket.on("typing", ({ groupId, username, isTyping }) => {

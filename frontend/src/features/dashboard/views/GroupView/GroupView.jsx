@@ -5,6 +5,11 @@ import GroupChat from '../../../chat/GroupChat/GroupChat';
 import GroupActionModal from './GroupModal/GroupActionModal';
 import GroupSettingsModal from './settings/GroupSettingsModal';
 import groupService from '../../../../services/groupService';
+
+import { socket } from '../../../chat/GroupChat/GroupChat';
+
+import { Alert, Snackbar } from '@mui/material';
+
 import './GroupView.css';
 
 const GroupView = ({ user, theme }) => {
@@ -13,12 +18,47 @@ const GroupView = ({ user, theme }) => {
     const [selectedGroup, setSelectedGroup] = useState(null);
     const [showActionModal, setShowActionModal] = useState(false);
     const [showSettingsModal, setShowSettingsModal] = useState(false);
+    const [notification, setNotification] = useState(null);
+
 
     useEffect(() => {
-        if (user) {
-            fetchGroups();
-        }
+        if (!user) return;
+
+        fetchGroups();
+
+        const setupPersonalRoom = () => {
+            console.log(`[Socket] Setting up personal room for: ${user}`);
+            socket.emit("setup_user", user);
+        };
+
+        
+        if (socket.connected) setupPersonalRoom();
+        socket.on("connect", setupPersonalRoom);
+
+        
+        const handleUpdate = () => {
+            console.log("[Socket] Sidebar refresh triggered");
+            fetchGroups(); 
+        };
+        
+        const handleNotification = (data) => {
+            console.log("[Socket] RECEIVED NOTIFICATION:", data);
+            setNotification(data);
+            fetchGroups(); 
+        };
+        
+        socket.on("added_to_group", handleUpdate);
+        socket.on("group_updated", handleUpdate);
+        socket.on("new_notification", handleNotification);
+        
+        return () => {
+            socket.off("connect", setupPersonalRoom);
+            socket.off("added_to_group", handleUpdate);
+            socket.off("group_updated", handleUpdate);
+            socket.off("new_notification", handleNotification);
+        };
     }, [user]);
+
 
     const fetchGroups = async () => {
         try {
@@ -36,13 +76,35 @@ const GroupView = ({ user, theme }) => {
 
 
     const handleLeaveGroup = async (groupId) => {
-        alert("Leave group functionality coming up!");
-        setShowSettingsModal(false);
+        try {
+            await groupService.leaveGroup(groupId, user);
+            setShowSettingsModal(false);
+            setSelectedGroup(null);
+            fetchGroups();
+
+        } catch (err) {
+            console.error("Failed to leave group", err);
+        }
     };
 
 
     return (
         <div className="group-view-container">
+            {/* NOTIFICATION POPUP */}
+            <Snackbar 
+                open={Boolean(notification)} 
+                autoHideDuration={6000} 
+                onClose={() => setNotification(null)}
+                anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+            >
+                {notification && (
+                    <Alert onClose={() => setNotification(null)} severity={notification.type} sx={{ width: '100%' }}>
+                        {notification.text}
+                    </Alert>
+                )}
+            </Snackbar>
+
+
             {/* SIDEBAR */}
             <GroupSidebar 
                 user={user}
