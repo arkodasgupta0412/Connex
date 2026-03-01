@@ -8,8 +8,6 @@ import groupService from '../../../../services/groupService';
 
 import { socket } from '../../../chat/GroupChat/GroupChat';
 
-import { Alert, Snackbar } from '@mui/material';
-
 import './GroupView.css';
 
 const GroupView = ({ user, theme }) => {
@@ -18,7 +16,6 @@ const GroupView = ({ user, theme }) => {
     const [selectedGroup, setSelectedGroup] = useState(null);
     const [showActionModal, setShowActionModal] = useState(false);
     const [showSettingsModal, setShowSettingsModal] = useState(false);
-    const [notification, setNotification] = useState(null);
 
 
     useEffect(() => {
@@ -41,21 +38,14 @@ const GroupView = ({ user, theme }) => {
             fetchGroups(); 
         };
         
-        const handleNotification = (data) => {
-            console.log("[Socket] RECEIVED NOTIFICATION:", data);
-            setNotification(data);
-            fetchGroups(); 
-        };
         
         socket.on("added_to_group", handleUpdate);
         socket.on("group_updated", handleUpdate);
-        socket.on("new_notification", handleNotification);
         
         return () => {
             socket.off("connect", setupPersonalRoom);
             socket.off("added_to_group", handleUpdate);
             socket.off("group_updated", handleUpdate);
-            socket.off("new_notification", handleNotification);
         };
     }, [user]);
 
@@ -90,20 +80,6 @@ const GroupView = ({ user, theme }) => {
 
     return (
         <div className="group-view-container">
-            {/* NOTIFICATION POPUP */}
-            <Snackbar 
-                open={Boolean(notification)} 
-                autoHideDuration={6000} 
-                onClose={() => setNotification(null)}
-                anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-            >
-                {notification && (
-                    <Alert onClose={() => setNotification(null)} severity={notification.type} sx={{ width: '100%' }}>
-                        {notification.text}
-                    </Alert>
-                )}
-            </Snackbar>
-
 
             {/* SIDEBAR */}
             <GroupSidebar 

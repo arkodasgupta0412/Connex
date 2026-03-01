@@ -1,14 +1,27 @@
 import { useState } from 'react';
+import { Badge } from '@mui/material'; // <--- Ensure Badge is imported
 
 import Sidebar from '../../components/sidebar/Sidebar';
 import SettingsSection from '../../components/settings/SettingsSection/SettingsSection';
 import ThemeModal from '../../components/settings/ThemeModal/ThemeModal';
 import UserSettings from '../../components/settings/UserSettings/UserSettings';
+import NotificationModal from './NotificationModal';
 import './AppSettings.css';
 
-const AppSettings = ({ isOpen, onClose, theme, onThemeChange, currentUser, onLogout }) => {
+
+const AppSettings = ({ 
+    isOpen, onClose, theme, onThemeChange, currentUser, onLogout, 
+    notifications = [], hasUnseen, onOpenNotifications, onClearNotifications 
+}) => {
     const [themeModalOpen, setThemeModalOpen] = useState(false);
     const [accountModalOpen, setAccountModalOpen] = useState(false);
+    const [notificationsModalOpen, setNotificationsModalOpen] = useState(false);
+
+
+    const handleNotificationsClick = () => {
+        if (onOpenNotifications) onOpenNotifications();
+        setNotificationsModalOpen(true);
+    };
     
     return (
         <>
@@ -21,10 +34,16 @@ const AppSettings = ({ isOpen, onClose, theme, onThemeChange, currentUser, onLog
                         showArrow={true}
                     />
 
+                    
                     <SettingsSection 
-                        title="Notifications"
+                        title={
+                            <div className="settings-badge-wrapper">
+                                Notifications
+                                <Badge color="error" variant="dot" invisible={!hasUnseen} />
+                            </div>
+                        }
                         description="Configure alerts and sounds"
-                        onClick={() => alert("Notification settings coming soon!")}
+                        onClick={handleNotificationsClick}
                         showArrow={true}
                     />
                     
@@ -54,8 +73,15 @@ const AppSettings = ({ isOpen, onClose, theme, onThemeChange, currentUser, onLog
                 onClose={() => setAccountModalOpen(false)}
                 username={currentUser} 
             />
+
+            {/* 4. RENDERING NOTIFICATION MODAL */}
+            <NotificationModal
+                isOpen={notificationsModalOpen}
+                onClose={() => setNotificationsModalOpen(false)}
+                notifications={notifications}
+                onClear={onClearNotifications}
+            />
         </>
-        
     );
 };
 

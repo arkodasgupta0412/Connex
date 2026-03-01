@@ -100,3 +100,20 @@
 .spacer {
     flex: 1;
 }
+
+/* --- Programmatic Force-Open State --- */
+.app-sidebar-wrapper.force-open .app-sidebar {
+    width: 68px;
+    box-shadow: 4px 0 15px rgba(0,0,0,0.2);
+}
+
+.app-sidebar-wrapper.force-open .sidebar-trigger {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.app-sidebar-wrapper.force-open .sidebar-icons {
+    opacity: 1;
+    pointer-events: auto;
+    transition-delay: 0.1s;
+}

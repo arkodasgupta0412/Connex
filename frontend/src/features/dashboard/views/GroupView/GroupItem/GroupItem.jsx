@@ -14,14 +14,10 @@ const GroupItem = ({ group, isActive, onClick, unreadCount, avatarUrl, lastMessa
                 const senderNick = group.nicknames?.[lastMessage.sender] || lastMessage.sender;
                 displayMsg = `${senderNick}: Photo`;
             }
+
         } else if (lastMessage.type === 'system') {
-            let sysText = lastMessage.content || "";
-            if (group.nicknames) {
-                Object.keys(group.nicknames).forEach(uname => {
-                    sysText = sysText.replace(new RegExp(`\\b${uname}\\b`, 'g'), group.nicknames[uname]);
-                });
-            }
-            displayMsg = sysText;
+            displayMsg = lastMessage.content || "";
+            
         } else {
             if (lastMessage.sender === currentUser) {
                 displayMsg = `You: ${lastMessage.content}`;
