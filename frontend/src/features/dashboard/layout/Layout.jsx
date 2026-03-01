@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react';
-import AppSidebar from '../../../../app/AppSidebar/AppSidebar';
-import AppSettings from '../../../../app/settings/AppSettings'; 
+import AppSidebar from '../../../app/AppSidebar/AppSidebar';
+import AppSettings from '../../../app/settings/AppSettings'; 
 
-import GroupView from '../../views/GroupView/GroupView';
-import DMView from '../../views/DmView/DmView';
-import ThreadView from '../../views/ThreadView/ThreadView';
-import FeedView from '../../views/FeedView/FeedView';
+import GroupView from '../views/GroupView/GroupView';
+import DMView from '../views/DmView/DmView';
+import ThreadView from '../views/ThreadView/ThreadView';
+import FeedView from '../views/FeedView/FeedView';
 
-import { socket } from '../../../chat/GroupChat/GroupChat';
-import userService from '../../../../services/userService';
+import { socket } from '../../chat/GroupChat/GroupChat';
+import userService from '../../../services/userService';
 
 import './Layout.css';
 

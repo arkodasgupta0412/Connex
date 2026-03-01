@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 
 import AuthForm from '../features/auth/components/AuthForm'; 
-import Dashboard from '../features/dashboard/components/Layout/Layout';
+import Dashboard from '../features/dashboard/layout/Layout';
 import { AVAILABLE_THEMES } from '../config/themes';
 import '../styles/index.css';
 
