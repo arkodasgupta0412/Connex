@@ -137,10 +137,10 @@ const GroupSettingsModal = ({ isOpen, onClose, group, currentUser, onLeaveGroup,
         if (onGroupUpdated) onGroupUpdated();
     };
 
-    // --- NEW: Request Handlers ---
+    // --- Request Handlers ---
     const handleAcceptRequest = async (username) => {
         try {
-            await groupService.acceptRequest(group.id || group._id, username);
+            await groupService.acceptRequest(group.id || group._id, username, currentUser);
             if (onGroupUpdated) onGroupUpdated();
         } catch (error) {
             console.error("Error accepting request", error);
@@ -149,7 +149,7 @@ const GroupSettingsModal = ({ isOpen, onClose, group, currentUser, onLeaveGroup,
 
     const handleRejectRequest = async (username) => {
         try {
-            await groupService.rejectRequest(group.id || group._id, username);
+            await groupService.rejectRequest(group.id || group._id, username, currentUser);
             if (onGroupUpdated) onGroupUpdated();
         } catch (error) {
             console.error("Error rejecting request", error);
@@ -157,7 +157,7 @@ const GroupSettingsModal = ({ isOpen, onClose, group, currentUser, onLeaveGroup,
     };
 
     const currentAvatar = removeAvatar ? null : (avatarPreview || group.avatarUrl);
-    const currentBanner = removeBanner ? null : (bannerPreview || group.bannerUrl || 'https://via.placeholder.com/600x150?text=No+Banner');
+    const currentBanner = removeBanner ? null : (bannerPreview || group.bannerUrl);
 
     return (
         <Dialog open={isOpen} onClose={onClose} classes={{ paper: 'settings-modal-paper' }} maxWidth="sm" fullWidth>
@@ -343,7 +343,7 @@ const GroupSettingsModal = ({ isOpen, onClose, group, currentUser, onLeaveGroup,
                                                     )}
                                                 </div>
                                             }
-                                            secondary={isUserOwner ? 'Owner' : (isUserAdmin ? 'Admin' : 'Member')}
+                                            secondary={`@${member} • ${isUserOwner ? 'Owner' : (isUserAdmin ? 'Admin' : 'Member')}`}
                                             classes={{ 
                                                 primary: `member-name-text ${isCurrentUser ? 'current-user' : ''}`, 
                                                 secondary: `member-role-text ${isUserOwner ? 'owner-role' : (isUserAdmin ? 'admin-role' : '')}` 

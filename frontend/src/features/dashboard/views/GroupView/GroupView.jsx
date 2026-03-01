@@ -90,20 +90,6 @@ const GroupView = ({ user, theme }) => {
 
     return (
         <div className="group-view-container">
-            {/* NOTIFICATION POPUP */}
-            <Snackbar 
-                open={Boolean(notification)} 
-                autoHideDuration={6000} 
-                onClose={() => setNotification(null)}
-                anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-            >
-                {notification && (
-                    <Alert onClose={() => setNotification(null)} severity={notification.type} sx={{ width: '100%' }}>
-                        {notification.text}
-                    </Alert>
-                )}
-            </Snackbar>
-
 
             {/* SIDEBAR */}
             <GroupSidebar 

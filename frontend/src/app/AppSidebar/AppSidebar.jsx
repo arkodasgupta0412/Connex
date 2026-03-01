@@ -1,5 +1,4 @@
-import { useState } from 'react';
-
+import { Badge } from '@mui/material';
 import './AppSidebar.css';
 
 // Icons
@@ -11,11 +10,10 @@ import DynamicFeedIcon from '@mui/icons-material/DynamicFeed'; // Feed
 import SettingsIcon from '@mui/icons-material/Settings';       // Settings
 
 
-const AppSidebar = ({ onOpenSettings }) => {
-    const [activeView, setActiveView] = useState('group');
-
+const AppSidebar = ({ activeView, setActiveView, onOpenSettings, hasUnseen, forceOpen }) => {
+    
     return (
-        <div className="app-sidebar-wrapper">
+        <div className={`app-sidebar-wrapper ${forceOpen ? 'force-open' : ''}`}>
             <div className="app-sidebar">
                 
                 {/* Collapsed State: ">>" Icon */}
@@ -65,7 +63,10 @@ const AppSidebar = ({ onOpenSettings }) => {
                         onClick={onOpenSettings}
                         title="Settings"
                     >
-                        <SettingsIcon />
+                        {/* RED DOT BADGE ADDED HERE */}
+                        <Badge color="error" variant="dot" invisible={!hasUnseen}>
+                            <SettingsIcon />
+                        </Badge>
                     </button>
                 </div>
                 

@@ -47,12 +47,6 @@ const ChatMessage = ({ msg, user, group, onComment, theme, socket, groupId, onEd
 
 
     let displayContent = msg.content;
-    if (msg.type === 'system' && group?.nicknames) {
-        Object.keys(group.nicknames).forEach(uname => {
-            const regex = new RegExp(`\\b${uname}\\b`, 'g');
-            displayContent = displayContent.replace(regex, group.nicknames[uname]);
-        });
-    }
 
     const handleReaction = (type) => {
         socket.emit("toggle_reaction", { groupId, messageId: msg.id, username: currentUser, reactionType: type });
