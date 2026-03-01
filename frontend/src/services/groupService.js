@@ -36,20 +36,22 @@ const groupService = {
     },
 
 
-    acceptRequest: async(groupId, username) => {
+    acceptRequest: async(groupId, username, adminUsername) => {
         const payload = {
             groupId: groupId,
-            username: username
+            username: username,
+            adminUsername: adminUsername
         };
         const response = await api.post('/groups/request/accept', payload);
         return response.data;
     },
 
 
-    rejectRequest: async(groupId, username) => {
+    rejectRequest: async(groupId, username, adminUsername) => {
         const payload = {
             groupId: groupId,
-            username: username
+            username: username,
+            adminUsername: adminUsername
         };
         const response = await api.post('/groups/request/reject', payload);
         return response.data;

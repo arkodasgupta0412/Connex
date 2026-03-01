@@ -31,6 +31,24 @@ const uploadService = {
             data: { fileUrl } 
         });
         return response.data;
+    },
+
+
+    getNotifications: async (username) => {
+        const response = await api.get(`/users/${username}/notifications`);
+        return response.data;
+    },
+
+
+    markNotificationsRead: async (username) => {
+        const response = await api.put(`/users/${username}/notifications/read`);
+        return response.data;
+    },
+
+    
+    clearNotifications: async (username) => {
+        const response = await api.delete(`/users/${username}/notifications`);
+        return response.data;
     }
 }
 

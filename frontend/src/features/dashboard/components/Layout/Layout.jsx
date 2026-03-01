@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import AppSidebar from '../../../../app/AppSidebar/AppSidebar';
 import AppSettings from '../../../../app/settings/AppSettings'; 
 
@@ -7,11 +7,61 @@ import DMView from '../../views/DmView/DmView';
 import ThreadView from '../../views/ThreadView/ThreadView';
 import FeedView from '../../views/FeedView/FeedView';
 
+import { socket } from '../../../chat/GroupChat/GroupChat';
+import userService from '../../../../services/userService';
+
 import './Layout.css';
 
 const Layout = ({ user, onLogout, theme, onThemeChange }) => {
     const [activeView, setActiveView] = useState('group'); 
     const [showSettings, setShowSettings] = useState(false);
+
+    // --- Notification State ---
+    const [notifications, setNotifications] = useState([]);
+    const [hasUnseen, setHasUnseen] = useState(false);
+    const [forceSidebarOpen, setForceSidebarOpen] = useState(false);
+
+    useEffect(() => {
+        if (user) {
+            fetchNotifications();
+            
+            const handleNewNotification = () => {
+                fetchNotifications();
+                
+                setForceSidebarOpen(true);
+                setTimeout(() => setForceSidebarOpen(false), 4000);
+            };
+
+            socket.on('new_notification', handleNewNotification);
+            return () => {
+                socket.off('new_notification', handleNewNotification);
+            };
+        }
+    }, [user]);
+
+    const fetchNotifications = async () => {
+        try {
+            const data = await userService.getNotifications(user);
+            setNotifications(data);
+            setHasUnseen(data.some(n => !n.isRead));
+        } catch (err) { console.error("Failed to fetch notifications", err); }
+    };
+
+    const handleOpenNotificationsModal = async () => {
+        setHasUnseen(false);
+        try {
+            await userService.markNotificationsRead(user);
+            fetchNotifications();
+        } catch (err) { console.error("Failed to mark notifications read", err); }
+    };
+
+    const handleClearNotifications = async () => {
+        try {
+            await userService.clearNotifications(user);
+            setNotifications([]);
+            setHasUnseen(false);
+        } catch (err) { console.error("Failed to clear notifications", err); }
+    };
 
     const renderActiveView = () => {
         switch (activeView) {
@@ -29,6 +79,8 @@ const Layout = ({ user, onLogout, theme, onThemeChange }) => {
                 activeView={activeView}
                 setActiveView={setActiveView}
                 onOpenSettings={() => setShowSettings(true)} 
+                hasUnseen={hasUnseen}
+                forceOpen={forceSidebarOpen}
             />
 
             <div className="main-content">
@@ -42,6 +94,10 @@ const Layout = ({ user, onLogout, theme, onThemeChange }) => {
                 onThemeChange={onThemeChange}
                 currentUser={user}
                 onLogout={onLogout}
+                notifications={notifications}
+                hasUnseen={hasUnseen}
+                onOpenNotifications={handleOpenNotificationsModal}
+                onClearNotifications={handleClearNotifications}
             />
         </div>
     );
