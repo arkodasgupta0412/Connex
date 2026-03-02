@@ -1,0 +1,23 @@
+.dm-settings-paper {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+}
+
+.dm-settings-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.dm-settings-close-btn {
+    color: var(--text-secondary) !important;
+}
+
+.dm-settings-content {
+    padding: 24px !important;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-width: 300px;
+}

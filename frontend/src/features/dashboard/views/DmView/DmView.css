@@ -1,9 +1,50 @@
-.placeholder-view {
-    flex: 1;
+.dm-view-container {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: var(--bg-primary);
+}
+
+.dm-sidebar-wrapper {
+    width: 350px;
+    flex-shrink: 0;
+    height: 100%;
+    border-right: 1px solid var(--sidebar-border);
     display: flex;
     flex-direction: column;
+}
+
+.dm-loading {
+    padding: 20px;
+    text-align: center;
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
+.dm-chat-wrapper {
+    flex: 1;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    background-color: var(--chat-bg);
+}
+
+.dm-empty-state {
+    display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--text-secondary);
+    height: 100%;
     background-color: var(--bg-primary);
+}
+
+.dm-empty-message {
+    background-color: var(--bg-tertiary);
+    color: var(--text-secondary);
+    padding: 12px 24px;
+    border-radius: 24px;
+    font-size: 14px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-color);
 }

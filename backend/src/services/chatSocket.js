@@ -6,14 +6,18 @@ import User from '../models/User.js';
 export default (io) => {
     io.on("connection", (socket) => {
 
-        socket.on("join_group", (groupId) => {
-            socket.join(groupId);
-        });
-
         socket.on("setup_user", (username) => {
             if (username) {
                 socket.join(username);
             }
+        });
+
+        socket.on("join_group", (groupId) => {
+            socket.join(groupId);
+        });
+
+        socket.on("join_dm", (dmId) => {
+            socket.join(dmId);
         });
         
 
@@ -56,6 +60,39 @@ export default (io) => {
                 };
                 io.to(data.groupId).emit("receive_message", broadcastData);
             } catch (err) { console.error("Socket send_message error:", err); }
+        });
+
+
+        // direct messages 1-1
+        socket.on("mark_dm_read", async ({ dmId, username }) => {
+            try {
+                const dm = await DM.findById(dmId);
+                if (dm) {
+                    dm.lastRead.set(username, new Date());
+                    await dm.save();
+                }
+            } catch(err) { console.error(err); }
+        });
+
+        
+        socket.on("send_dm_message", async (data) => {
+            try {
+                const dm = await DM.findById(data.dmId);
+                if (!dm || dm.blockedBy.length > 0) return; // Prevent sending if blocked
+
+                const newMessage = new DMMessage({
+                    dmId: data.dmId,
+                    sender: data.sender,
+                    type: data.type || 'text',
+                    content: data.content,
+                    caption: data.caption || "",
+                    timestamp: data.timestamp
+                });
+                await newMessage.save();
+
+                const broadcastData = { ...data, id: newMessage._id.toString() };
+                io.to(data.dmId).emit("receive_dm_message", broadcastData);
+            } catch (err) { console.error(err); }
         });
 
 

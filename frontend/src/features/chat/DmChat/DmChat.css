@@ -1,0 +1,30 @@
+.dm-chat-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background-color: var(--chat-bg);
+}
+
+.chat-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 15px;
+    display: flex;
+    flex-direction: column;
+}
+
+.empty-chat-message {
+    text-align: center;
+    color: var(--text-muted);
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
+.blocked-banner {
+    padding: 15px;
+    text-align: center;
+    background-color: var(--bg-tertiary);
+    color: var(--danger-color);
+    border-top: 1px solid var(--border-color);
+    font-weight: bold;
+}
