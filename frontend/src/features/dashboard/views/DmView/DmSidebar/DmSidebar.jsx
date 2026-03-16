@@ -1,14 +1,38 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import DmItem from '../DmItem/DmItem';
+import userService from '../../../../../services/userService';
 import './DmSidebar.css';
 
 const DmSidebar = ({ dms, currentUser, selectedDm, onSelectDm, onStartChat }) => {
     const [searchQuery, setSearchQuery] = useState("");
+    const [searchResults, setSearchResults] = useState([]);
+    const [isSearching, setIsSearching] = useState(false);
 
-    const handleSearchSubmit = (e) => {
-        e.preventDefault();
-        onStartChat(searchQuery.trim());
+    useEffect(() => {
+        const fetchUsers = async () => {
+            if (!searchQuery.trim()) {
+                setSearchResults([]);
+                return;
+            }
+            setIsSearching(true);
+            try {
+                const results = await userService.searchUsers(searchQuery);
+                setSearchResults(results.filter(u => u.username !== currentUser));
+            } catch (err) {
+                console.error("Search error", err);
+            } finally {
+                setIsSearching(false);
+            }
+        };
+
+        const timer = setTimeout(() => fetchUsers(), 300);
+        return () => clearTimeout(timer);
+    }, [searchQuery, currentUser]);
+
+    const handleStartClick = (username) => {
+        onStartChat(username);
         setSearchQuery("");
+        setSearchResults([]);
     };
 
     return (
@@ -19,15 +43,43 @@ const DmSidebar = ({ dms, currentUser, selectedDm, onSelectDm, onStartChat }) =>
 
             <div className="dm-search-section">
                 <div className="dm-search-label">Start a DM ?</div>
-                <form onSubmit={handleSearchSubmit} className="dm-search-form">
+                <div className="dm-search-container">
+                    
+                    
                     <input 
-                        type="text" 
-                        placeholder="search username..." 
+                        type="text"
+                        placeholder="search username..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         className="dm-search-input"
+                        spellCheck="false"
                     />
-                </form>
+                    
+                    {searchQuery.trim().length > 0 && (
+                        <div className="dm-search-dropdown">
+                            {isSearching ? (
+                                <div className="dm-search-msg">Searching...</div>
+                            ) : searchResults.length > 0 ? (
+                                searchResults.map(user => (
+                                    <div key={user.username} className="dm-search-result-item">
+                                        <div className="dm-search-result-info">
+                                            <span className="dm-search-result-name">{user.profileName}</span>
+                                            <span className="dm-search-result-username">@{user.username}</span>
+                                        </div>
+                                        <button 
+                                            className="start-chat-btn"
+                                            onClick={() => handleStartClick(user.username)}
+                                        >
+                                            Start chat
+                                        </button>
+                                    </div>
+                                ))
+                            ) : (
+                                <div className="dm-search-msg">No users found</div>
+                            )}
+                        </div>
+                    )}
+                </div>
             </div>
 
             <div className="dm-list">

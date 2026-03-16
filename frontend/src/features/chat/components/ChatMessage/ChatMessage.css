@@ -172,3 +172,25 @@
 .mention-highlight:hover {
     text-decoration: underline;
 }
+
+/* AI Soothing Message Styling */
+.ai-soothing-message {
+    background: rgba(160, 123, 241, 0.1) !important; /* Soft calming purple */
+    color: #b091f3 !important;
+    border: 1px solid rgba(160, 123, 241, 0.3) !important;
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 500;
+    font-size: 13.5px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    max-width: 85%;
+    line-height: 1.5;
+}
+
+.ai-icon-wrapper {
+    display: flex;
+    align-items: center;
+    margin-right: 8px;
+}

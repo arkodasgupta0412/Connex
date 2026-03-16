@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 import GroupSidebar from './GroupSidebar/GroupSidebar';
 import GroupChat from '../../../chat/GroupChat/GroupChat';
@@ -17,6 +17,8 @@ const GroupView = ({ user, theme }) => {
     const [showActionModal, setShowActionModal] = useState(false);
     const [showSettingsModal, setShowSettingsModal] = useState(false);
 
+    // Use a ref to protect the active group from stale DB fetches
+    const activeGroupId = useRef(null);
 
     useEffect(() => {
         if (!user) return;
@@ -24,20 +26,15 @@ const GroupView = ({ user, theme }) => {
         fetchGroups();
 
         const setupPersonalRoom = () => {
-            console.log(`[Socket] Setting up personal room for: ${user}`);
             socket.emit("setup_user", user);
         };
-
         
         if (socket.connected) setupPersonalRoom();
         socket.on("connect", setupPersonalRoom);
-
         
         const handleUpdate = () => {
-            console.log("[Socket] Sidebar refresh triggered");
             fetchGroups(); 
         };
-        
         
         socket.on("added_to_group", handleUpdate);
         socket.on("group_updated", handleUpdate);
@@ -49,44 +46,64 @@ const GroupView = ({ user, theme }) => {
         };
     }, [user]);
 
-
     const fetchGroups = async () => {
         try {
             const data = await groupService.fetchAllGroups(user);
-            setUserGroups(data.userGroups);
-            setAllGroups(data.otherGroups);
+            
+            // Protect the active group's 0 badge from being overwritten by stale background fetches
+            const clearStaleBadge = (g) => 
+                g.id === activeGroupId.current ? { ...g, unreadCount: 0, unread: 0, unreadMessages: 0, hasUnread: false } : g;
+
+            setUserGroups((data.userGroups || []).map(clearStaleBadge));
+            setAllGroups((data.otherGroups || []).map(clearStaleBadge));
 
             if (selectedGroup) {
-                const updatedSelected = [...data.userGroups, ...data.otherGroups].find(g => g.id === selectedGroup.id);
+                const updatedSelected = [...(data.userGroups || []), ...(data.otherGroups || [])].find(g => g.id === selectedGroup.id);
                 if (updatedSelected) setSelectedGroup(updatedSelected);
             }
 
         } catch (e) { console.error("Fetch error", e); }
     };
 
+    const handleSelectGroup = (group) => {
+        setSelectedGroup(group);
+        setShowSettingsModal(false);
+        activeGroupId.current = group.id;
+
+        // FOOLPROOF UI UPDATE: Carpet-bomb all possible unread properties
+        const forceClearUnread = (g) => g.id === group.id ? { 
+            ...g, 
+            unreadCount: 0, 
+            unreadMessages: 0, 
+            unread: 0,
+            hasUnread: false,
+            lastRead: { ...(g.lastRead || {}), [user]: new Date().toISOString() }
+        } : g;
+
+        setUserGroups(prevGroups => prevGroups.map(forceClearUnread));
+        setAllGroups(prevGroups => prevGroups.map(forceClearUnread));
+    };
 
     const handleLeaveGroup = async (groupId) => {
         try {
             await groupService.leaveGroup(groupId, user);
             setShowSettingsModal(false);
             setSelectedGroup(null);
+            activeGroupId.current = null;
             fetchGroups();
-
         } catch (err) {
             console.error("Failed to leave group", err);
         }
     };
 
-
     return (
         <div className="group-view-container">
 
-            {/* SIDEBAR */}
             <GroupSidebar 
                 user={user}
                 userGroups={userGroups}
                 selectedGroup={selectedGroup}
-                onSelectGroup={setSelectedGroup}
+                onSelectGroup={handleSelectGroup} 
                 onOpenActionModal={() => setShowActionModal(true)} 
             />
 
@@ -95,7 +112,7 @@ const GroupView = ({ user, theme }) => {
                     <GroupChat 
                         user={user} 
                         group={selectedGroup} 
-                        onBack={() => setSelectedGroup(null)} 
+                        onBack={() => { setSelectedGroup(null); activeGroupId.current = null; }} 
                         theme={theme} 
                         onOpenSettings={() => setShowSettingsModal(true)}
                         onChatUpdate={fetchGroups}
@@ -108,7 +125,6 @@ const GroupView = ({ user, theme }) => {
                 )}
             </div>
 
-            {/* UPDATED MODAL PROPS */}
             <GroupActionModal 
                 isOpen={showActionModal}
                 onClose={() => setShowActionModal(false)}
@@ -116,7 +132,6 @@ const GroupView = ({ user, theme }) => {
                 onGroupCreated={fetchGroups} 
             />
 
-            {/* SETTINGS MODAL */}
             <GroupSettingsModal
                 isOpen={showSettingsModal}
                 onClose={() => setShowSettingsModal(false)}

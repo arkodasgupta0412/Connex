@@ -2,14 +2,12 @@ import { Avatar, IconButton, Menu, MenuItem, Tooltip } from '@mui/material';
 import { 
     ThumbUp, ThumbUpOutlined, Favorite, FavoriteBorder, 
     EmojiEmotions, EmojiEmotionsOutlined, MoreVert, ModeCommentOutlined,
-    SentimentDissatisfied, SentimentDissatisfiedOutlined,
-    Block as BlockIcon
+    Block as BlockIcon, AutoAwesome
 } from '@mui/icons-material';
 
 import { useState } from 'react';
 import CommentModal from '../CommentModal/CommentModal';
 import './ChatMessage.css'; 
-
 
 const getSenderColorIndex = (username) => {
     let hash = 0;
@@ -19,11 +17,8 @@ const getSenderColorIndex = (username) => {
     return (Math.abs(hash) % 6) + 1; // 1–6
 };
 
-
 const renderMessageText = (text) => {
     if (!text) return null;
-
-    // Split text by @mentions
     const parts = text.split(/(@\w+)/g);
     return parts.map((part, i) => {
         if (part.match(/(@\w+)/)) {
@@ -33,8 +28,8 @@ const renderMessageText = (text) => {
     });
 };
 
-
-const ChatMessage = ({ msg, user, group, onComment, theme, socket, groupId, onEditStart }) => {
+// ADDED isDm prop with a default of false
+const ChatMessage = ({ msg, user, group, onComment, theme, socket, groupId, onEditStart, isDm = false }) => {
     const senderName = (msg.sender || '').trim();
     const currentUser = (user || '').trim();
     const isMe = senderName.toLowerCase() === currentUser.toLowerCase();
@@ -42,29 +37,29 @@ const ChatMessage = ({ msg, user, group, onComment, theme, socket, groupId, onEd
 
     const [showComments, setShowComments] = useState(false);
     const [anchorEl, setAnchorEl] = useState(null);
-    const [isEditing, setIsEditing] = useState(false);
-    const [editContent, setEditContent] = useState(msg.content);
-
 
     let displayContent = msg.content;
 
+    // BRANCHED SOCKET EMITS
     const handleReaction = (type) => {
-        socket.emit("toggle_reaction", { groupId, messageId: msg.id, username: currentUser, reactionType: type });
-    };
-
-    const handleEditSubmit = () => {
-        socket.emit("edit_message", { groupId, messageId: msg.id, newContent: editContent });
-        setIsEditing(false);
+        if (isDm) {
+            socket.emit("toggle_dm_reaction", { dmId: groupId, messageId: msg.id, username: currentUser, reactionType: type });
+        } else {
+            socket.emit("toggle_reaction", { groupId, messageId: msg.id, username: currentUser, reactionType: type });
+        }
     };
 
     const handleDelete = () => {
-        socket.emit("delete_message", { groupId, messageId: msg.id });
+        if (isDm) {
+            socket.emit("delete_dm_message", { dmId: groupId, messageId: msg.id });
+        } else {
+            socket.emit("delete_message", { groupId, messageId: msg.id });
+        }
         setAnchorEl(null);
     };
 
     const reactions = msg.reactions || {};
     const hasReacted = (type) => (reactions[type] || []).includes(currentUser);
-
 
     if (msg.type === 'system') {
         return (
@@ -89,7 +84,6 @@ const ChatMessage = ({ msg, user, group, onComment, theme, socket, groupId, onEd
 
             <div className={`message-bubble ${msg.isDeleted ? 'deleted-bubble' : ''}`}>
                 
-                {/* SENDER NAME */}
                 <div className={`sender-name ${senderColorClass}`}>
                     {isMe ? 'You' : senderNickname}
                 </div>
@@ -108,8 +102,6 @@ const ChatMessage = ({ msg, user, group, onComment, theme, socket, groupId, onEd
                     </div>
                 )}
 
-
-                {/* CONTENT */}
                 {msg.isDeleted ? (
                     <div className="message-text deleted-text">
                         <BlockIcon fontSize="inherit" sx={{ mr: 0.5, verticalAlign: 'middle' }} />
@@ -117,7 +109,6 @@ const ChatMessage = ({ msg, user, group, onComment, theme, socket, groupId, onEd
                     </div>
                 ) : msg.type === 'text' ? (
                     <div className="message-text">
-                        {/* Use the new parser here! */}
                         {renderMessageText(msg.content)} 
                         {msg.isEdited && <span className="edited-tag">(edited)</span>}
                     </div>
@@ -132,8 +123,6 @@ const ChatMessage = ({ msg, user, group, onComment, theme, socket, groupId, onEd
                     </div>
                 )}
 
-
-                {/* LIKE & COMMENT BUTTONS */}
                 {!msg.isDeleted && (
                     <div className="message-actions">
                         <div className="reaction-bar">
@@ -149,24 +138,18 @@ const ChatMessage = ({ msg, user, group, onComment, theme, socket, groupId, onEd
                         )}
                     </div>
                 )}
-
                 
-                {/* TIMESTAMP */}
                 <div className="message-time">
                     {new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
                 </div>
             </div>
 
-            
-            {/* User's own avatar on the right */}
             {isMe && (
                 <Avatar sx={{ width: 32, height: 32, ml: 1, bgcolor: '#23a559' }}>
                     {senderNickname.charAt(0).toUpperCase()}
                 </Avatar>
             )}
 
-
-            {/* COMMENT MODAL */}
             {msg.type === 'photo' && showComments && (
                 <CommentModal
                     msg={msg}

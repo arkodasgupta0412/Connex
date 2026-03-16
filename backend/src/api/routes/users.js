@@ -3,6 +3,28 @@ import User from '../../models/User.js';
 
 const router = express.Router();
 
+
+// Search for user
+router.get('/search/query', async (req, res) => {
+    try {
+        const { q } = req.query;
+        if (!q) return res.json([]);
+
+        // Regex for prefix match, case-insensitive (e.g., typing "Ale" matches "Alex" and "Alexandria")
+        const regex = new RegExp(`^${q}`, 'i');
+        const users = await User.find({ username: regex })
+            .select('username profileName avatarUrl')
+            .limit(10)
+            .lean();
+
+        res.json(users);
+    } catch (err) {
+        console.error("User Search Error:", err);
+        res.status(500).json({ error: "Server error" });
+    }
+});
+
+
 // Fetch User Profile
 router.get('/:username', async (req, res) => {
     try {

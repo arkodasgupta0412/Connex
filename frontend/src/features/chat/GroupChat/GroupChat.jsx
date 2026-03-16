@@ -14,7 +14,6 @@ import uploadService from '../../../services/uploadService';
 import { API_URL } from  '../../../config/index'; 
 import './GroupChat.css'; 
 
-
 export const socket = io.connect(API_URL, {
     reconnection: true,
     reconnectionDelay: 1000,
@@ -34,8 +33,11 @@ const GroupChat = ({ user, group, onBack, theme, onOpenSettings, onChatUpdate })
     const [uploadedImageUrl, setUploadedImageUrl] = useState(null);
     const [editingMessage, setEditingMessage] = useState(null);
     const [typingUsers, setTypingUsers] = useState(new Set());
+    
+    // --- FIXED: ADDED PII ALERT STATE ---
+    const [piiAlert, setPiiAlert] = useState(null);
+    
     const messagesEndRef = useRef(null);
-
     let typingTimeout = useRef(null);
 
     const scrollToBottom = () => {
@@ -61,7 +63,6 @@ const GroupChat = ({ user, group, onBack, theme, onOpenSettings, onChatUpdate })
         };
         fetchHistory();
 
-
         const handleReceiveMsg = (data) => {
             if(data.groupId !== group.id) return;
             setMessages((prev) => {
@@ -69,32 +70,18 @@ const GroupChat = ({ user, group, onBack, theme, onOpenSettings, onChatUpdate })
                 return [...prev, data];
             });
             socket.emit("mark_read", { groupId: group.id, username: user });
-            if (onChatUpdate) onChatUpdate();
+            if (data.type !== 'system' && onChatUpdate) {
+                onChatUpdate();
+            }
         };
 
-
-        const handleUpdateComments = ({ messageId, comment }) => {
-            setMessages((prev) => prev.map(msg => {
-                if (msg.id === messageId) {
-                    const updatedComments = msg.comments ? [...msg.comments, comment] : [comment];
-                    return { ...msg, comments: updatedComments };
-                }
-                return msg;
-            }));
+        // --- REMOVED WINDOW.CONFIRM AND REPLACED WITH MODAL TRIGGER ---
+        const handlePiiConfirmation = ({ originalData, roomType }) => {
+            setPiiAlert({ originalData, roomType });
         };
-
-
-        const handleUpdateLikes = ({ messageId, likes, likedBy }) => {
-            setMessages((prev) => prev.map(msg => {
-                if (msg.id === messageId) {
-                    return { ...msg, likes, likedBy };
-                }
-                return msg;
-            }));
-        };
-
 
         socket.on("receive_message", handleReceiveMsg);
+        socket.on("pii_confirmation_required", handlePiiConfirmation);
         
         socket.on("display_typing", ({ username, isTyping }) => {
             setTypingUsers(prev => {
@@ -134,9 +121,9 @@ const GroupChat = ({ user, group, onBack, theme, onOpenSettings, onChatUpdate })
             } : m));
         });
 
-
         return () => {
             socket.off("receive_message", handleReceiveMsg);
+            socket.off("pii_confirmation_required", handlePiiConfirmation);
             socket.off("display_typing");
             socket.off("message_edited");
             socket.off("message_deleted");
@@ -144,7 +131,6 @@ const GroupChat = ({ user, group, onBack, theme, onOpenSettings, onChatUpdate })
             socket.off("update_comments");
         };
     }, [group.id, user]);
-
 
     const handleTyping = (e) => {
         setInputText(e.target.value);
@@ -156,16 +142,13 @@ const GroupChat = ({ user, group, onBack, theme, onOpenSettings, onChatUpdate })
         }, 2000);
     };
 
-
     const isNewDay = (prevDate, currDate) => {
         if (!prevDate) return true;
         return new Date(prevDate).toDateString() !== new Date(currDate).toDateString();
     };
 
-
     const sendMessage = async () => {
         if (editingMessage) {
-            // Prevent sending an empty text message, but allow emptying an image caption
             if (editingMessage.type === 'text' && !inputText.trim()) return;
 
             const editPayload = { 
@@ -187,7 +170,6 @@ const GroupChat = ({ user, group, onBack, theme, onOpenSettings, onChatUpdate })
 
         if (!inputText.trim()) return;
 
-        // NORMAL SEND
         const msgData = { 
             groupId: group.id, 
             sender: user, 
@@ -202,7 +184,6 @@ const GroupChat = ({ user, group, onBack, theme, onOpenSettings, onChatUpdate })
         setInputText("");
         if (onChatUpdate) onChatUpdate();
     };
-
 
     const handleFileUpload = async (event) => {
         const file = event.target.files[0];
@@ -219,7 +200,6 @@ const GroupChat = ({ user, group, onBack, theme, onOpenSettings, onChatUpdate })
             alert("Upload failed");
         }
     };
-
 
     const sendPhotoWithCaption = () => {
         if (!uploadedImageUrl) return;
@@ -244,7 +224,6 @@ const GroupChat = ({ user, group, onBack, theme, onOpenSettings, onChatUpdate })
         if (onChatUpdate) onChatUpdate();
     };
 
-
     const sendComment = (messageId, text) => {
         socket.emit("add_comment", { 
             groupId: group.id, 
@@ -255,16 +234,31 @@ const GroupChat = ({ user, group, onBack, theme, onOpenSettings, onChatUpdate })
         });
     };
 
+    // --- FIXED: ADDED MODAL HANDLERS ---
+    const handleConfirmPii = () => {
+        if (!piiAlert) return;
+        const eventName = piiAlert.roomType === 'group' ? "send_message" : "send_dm_message";
+        
+        socket.emit(eventName, { 
+            ...piiAlert.originalData, 
+            confirmedPII: true 
+        });
+        
+        setPiiAlert(null);
+        if (onChatUpdate) onChatUpdate();
+    };
+
+    const handleCancelPii = () => {
+        setPiiAlert(null); 
+    };
+
     const themeClass = theme === 'dark' ? 'dark' : 'light';
 
     return (
         <div className={`group-chat-container ${themeClass}`}>
             
-            {/* MODULAR HEADER */}
             <div style={{ position: 'relative' }}>
                 <ChatHeader groupName={group.name} onBack={onBack} />
-                
-                {/* THE SETTINGS GEAR ICON */}
                 <IconButton 
                     onClick={onOpenSettings}
                     title="Group Settings"
@@ -280,7 +274,6 @@ const GroupChat = ({ user, group, onBack, theme, onOpenSettings, onChatUpdate })
                 </IconButton>
             </div>
 
-
             <div className="chat-area">
                 {messages.length === 0 && <div className="empty-chat-message">No messages yet.</div>}
                 
@@ -293,7 +286,11 @@ const GroupChat = ({ user, group, onBack, theme, onOpenSettings, onChatUpdate })
                                     <Chip 
                                         label={new Date(msg.timestamp).toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })} 
                                         size="small" 
-                                        sx={{ bgcolor: 'var(--bg-tertiary)', color: 'var(--text-secondary)' }} 
+                                        sx={{ 
+                                            bgcolor: 'var(--system-msg-bg)', 
+                                            color: 'var(--system-msg-text)',
+                                            border: '1px solid var(--border-color)'
+                                        }} 
                                     />
                                 </div>
                             )}
@@ -322,7 +319,6 @@ const GroupChat = ({ user, group, onBack, theme, onOpenSettings, onChatUpdate })
                 <div ref={messagesEndRef} />
             </div>
 
-
             {editingMessage && (
                 <div className="edit-banner">
                     <div className="edit-banner-info">
@@ -339,8 +335,6 @@ const GroupChat = ({ user, group, onBack, theme, onOpenSettings, onChatUpdate })
                 </div>
             )}
 
-
-            {/* MODULAR INPUT */}
             <ChatInput 
                 value={inputText}
                 onChange={handleTyping}
@@ -348,8 +342,6 @@ const GroupChat = ({ user, group, onBack, theme, onOpenSettings, onChatUpdate })
                 onAttach={handleFileUpload}
             />
 
-
-            {/* CAPTION MODAL */}
             {showCaptionModal && (
                 <div className="caption-modal-overlay">
                     <div className="caption-modal">
@@ -390,6 +382,28 @@ const GroupChat = ({ user, group, onBack, theme, onOpenSettings, onChatUpdate })
                     </div>
                 </div>
             )}
+
+            {piiAlert && (
+                <div className="caption-modal-overlay">
+                    <div className="caption-modal" style={{ textAlign: 'center' }}>
+                        <h3 style={{ color: 'var(--danger-color)', margin: '0 0 10px 0', fontSize: '1.2rem' }}>
+                            Security Alert
+                        </h3>
+                        <p style={{ color: 'var(--text-primary)', fontSize: '0.95rem', lineHeight: '1.4', marginBottom: '20px' }}>
+                            This message appears to contain private information (like an OTP or password). Are you sure you want to send it?
+                        </p>
+                        <div className="caption-actions" style={{ justifyContent: 'center' }}>
+                            <button onClick={handleCancelPii} className="btn-caption-cancel">
+                                Cancel
+                            </button>
+                            <button onClick={handleConfirmPii} className="btn-caption-send" style={{ backgroundColor: 'var(--danger-color)' }}>
+                                Send Anyway
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
         </div>
     );
 };

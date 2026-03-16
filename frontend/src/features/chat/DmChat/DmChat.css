@@ -1,8 +1,21 @@
+/* --- MAIN LAYOUT --- */
 .dm-chat-container {
     display: flex;
     flex-direction: column;
     height: 100%;
     background-color: var(--chat-bg);
+}
+
+.dm-header-container {
+    position: relative;
+}
+
+.dm-settings-btn {
+    position: absolute !important;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-secondary) !important;
 }
 
 .chat-area {
@@ -20,6 +33,21 @@
     margin-bottom: auto;
 }
 
+/* --- DATE DIVIDER --- */
+.dm-date-divider {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.date-chip {
+    background-color: var(--system-msg-bg) !important;
+    color: var(--system-msg-text) !important;
+    border: 1px solid var(--border-color) !important;
+    box-shadow: var(--shadow-sm);
+    font-weight: 500 !important;
+}
+
+/* --- BLOCKED BANNER --- */
 .blocked-banner {
     padding: 15px;
     text-align: center;
@@ -27,4 +55,105 @@
     color: var(--danger-color);
     border-top: 1px solid var(--border-color);
     font-weight: bold;
+}
+
+/* --- EDIT BANNER --- */
+.edit-banner {
+    padding: 8px 15px;
+    background-color: var(--bg-tertiary);
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.edit-banner-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.edit-banner-title {
+    font-size: 12px;
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+.edit-banner-text {
+    font-size: 13px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 300px;
+}
+
+.edit-banner-close {
+    color: var(--text-secondary) !important;
+}
+
+/* --- CAPTION MODAL --- */
+.caption-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.caption-modal {
+    background-color: var(--bg-secondary);
+    padding: 20px;
+    border-radius: 12px;
+    width: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.caption-preview-img {
+    width: 100%;
+    max-height: 300px;
+    object-fit: contain;
+    border-radius: 8px;
+}
+
+.caption-input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-tertiary);
+    color: var(--text-primary);
+    outline: none;
+    resize: none;
+    height: 60px;
+    box-sizing: border-box; /* Prevents overflow */
+}
+
+.caption-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.btn-caption-cancel {
+    padding: 8px 16px;
+    background: transparent;
+    color: var(--text-secondary);
+    border: none;
+    cursor: pointer;
+}
+
+.btn-caption-send {
+    padding: 8px 16px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
 }

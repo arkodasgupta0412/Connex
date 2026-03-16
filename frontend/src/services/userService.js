@@ -32,6 +32,12 @@ const userService = {
     clearNotifications: async (username) => {
         const response = await api.delete(`/users/${username}/notifications`);
         return response.data;
+    },
+
+
+    searchUsers: async (query) => {
+        const response = await api.get(`/users/search/query?q=${query}`);
+        return response.data;
     }
 };
 

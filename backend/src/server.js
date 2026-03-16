@@ -10,13 +10,13 @@ dotenv.config({ path: path.join(__dirname, '../.env') });
 import express from 'express';
 import http from 'http';
 import { Server } from 'socket.io';
-import fs from 'fs';
 import connectDB from './config/db.js';
 
-import { UPLOAD_DIR, DB_USERS, DB_GROUPS } from './config/paths.js';
+
 import setupMiddleware from './api/middleware/setup.js';
 import authRoutes from './api/routes/auth.js';
 import groupRoutes from './api/routes/groups.js';
+import dmRoutes from './api/routes/dms.js';
 import uploadRoutes from './api/routes/uploads.js';
 import setupChatSocket from './services/chatSocket.js';
 import userRoutes from './api/routes/users.js';
@@ -34,6 +34,7 @@ setupMiddleware(app);
 
 app.use("/", authRoutes);
 app.use("/groups", groupRoutes(io));
+app.use('/dms', dmRoutes(io));
 app.use("/upload", uploadRoutes);
 app.use("/users", userRoutes);
 
